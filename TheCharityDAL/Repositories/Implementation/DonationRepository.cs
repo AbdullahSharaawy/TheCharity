@@ -1,0 +1,771 @@
+﻿using Microsoft.EntityFrameworkCore;
+using TheCharityDAL.Database;
+using TheCharityDAL.Entities;
+using TheCharityDAL.Repositories.Abstraction;
+
+namespace TheCharityDAL.Repositories.Implementation
+{
+    public class DonationRepository : IDonationRepository
+    {
+        private readonly TheCharityDbContext _context;
+
+        public DonationRepository(TheCharityDbContext context)
+        {
+            _context = context;
+        }
+
+        // ===== Donation CRUD Operations =====
+        public async Task<IEnumerable<Donation>> GetAllDonationsAsync(bool includeDeleted = false)
+        {
+            var query = _context.Donations.AsQueryable();
+
+            if (!includeDeleted)
+                query = query.Where(d => d.IsDeleted == false);
+
+            return await query
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .ToListAsync();
+        }
+
+        public async Task<Donation?> GetDonationByIdAsync(int id)
+        {
+            return await _context.Donations
+                .Where(d => d.Id == id && (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<Donation> AddDonationAsync(Donation donation)
+        {
+            _context.Donations.Add(donation);
+            await _context.SaveChangesAsync();
+            return donation;
+        }
+
+        public async Task<Donation> UpdateDonationAsync(Donation donation)
+        {
+            _context.Entry(donation).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+            return donation;
+        }
+
+        public async Task DeleteDonationAsync(int id)
+        {
+            var donation = await GetDonationByIdAsync(id);
+            if (donation != null)
+            {
+                donation.Delete();
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        public async Task RestoreDonationAsync(int id)
+        {
+            var donation = await _context.Donations
+                .Where(d => d.Id == id && d.IsDeleted == true)
+                .FirstOrDefaultAsync();
+
+            if (donation != null)
+            {
+                donation.Restore();
+                await _context.SaveChangesAsync();
+            }
+        }
+
+        // ===== Donation Filtering & Search =====
+        public async Task<IEnumerable<Donation>> GetDonationsByUserAsync(string userId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           (d.IsDeleted == false))
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByCampaignAsync(int campaignId)
+        {
+            return await _context.Donations
+                .Where(d => d.CampaignId == campaignId &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByAmountRangeAsync(double minAmount, double maxAmount)
+        {
+            return await _context.Donations
+                .Where(d => d.Amount >= minAmount &&
+                           d.Amount <= maxAmount &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.Amount)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByDateRangeAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= startDate &&
+                           d.RegistrationDate <= endDate &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderBy(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetRecentDonationsAsync(int days = 30)
+        {
+            var cutoffDate = DateTime.Now.AddDays(-days);
+
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= cutoffDate &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDeletedDonationsAsync()
+        {
+            return await _context.Donations
+                .Where(d => d.IsDeleted == true)
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .ToListAsync();
+        }
+
+        // ===== Donation Statistics =====
+        public async Task<double> GetTotalDonationsAmountAsync()
+        {
+            return await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        public async Task<double> GetTotalDonationsAmountByUserAsync(string userId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           (d.IsDeleted == false))
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        public async Task<double> GetTotalDonationsAmountByCampaignAsync(int campaignId)
+        {
+            return await _context.Donations
+                .Where(d => d.CampaignId == campaignId &&
+                           (d.IsDeleted == false))
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        public async Task<int> GetTotalDonationsCountAsync()
+        {
+            return await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .CountAsync();
+        }
+
+        public async Task<int> GetDonationsCountByUserAsync(string userId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           (d.IsDeleted == false))
+                .CountAsync();
+        }
+
+        public async Task<int> GetDonationsCountByCampaignAsync(int campaignId)
+        {
+            return await _context.Donations
+                .Where(d => d.CampaignId == campaignId &&
+                           (d.IsDeleted == false))
+                .CountAsync();
+        }
+
+        // ===== Advanced Analytics =====
+        public async Task<double> GetAverageDonationAmountAsync()
+        {
+            var totalAmount = await GetTotalDonationsAmountAsync();
+            var totalCount = await GetTotalDonationsCountAsync();
+
+            return totalCount > 0 ? totalAmount / totalCount : 0;
+        }
+
+        public async Task<double> GetAverageDonationAmountByUserAsync(string userId)
+        {
+            var totalAmount = await GetTotalDonationsAmountByUserAsync(userId);
+            var totalCount = await GetDonationsCountByUserAsync(userId);
+
+            return totalCount > 0 ? totalAmount / totalCount : 0;
+        }
+
+        public async Task<double> GetAverageDonationAmountByCampaignAsync(int campaignId)
+        {
+            var totalAmount = await GetTotalDonationsAmountByCampaignAsync(campaignId);
+            var totalCount = await GetDonationsCountByCampaignAsync(campaignId);
+
+            return totalCount > 0 ? totalAmount / totalCount : 0;
+        }
+
+        public async Task<Dictionary<string, double>> GetTopDonorsByAmountAsync(int limit = 10)
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Select(g => new { UserId = g.Key, TotalAmount = g.Sum(d => d.Amount ?? 0) })
+                .OrderByDescending(x => x.TotalAmount)
+                .Take(limit)
+                .ToListAsync();
+
+            return result
+                .Where(x => !string.IsNullOrEmpty(x.UserId))
+                .ToDictionary(x => x.UserId, x => x.TotalAmount);
+        }
+
+        public async Task<Dictionary<int, double>> GetTopCampaignsByDonationsAsync(int limit = 10)
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.CampaignId)
+                .Select(g => new { CampaignId = g.Key, TotalAmount = g.Sum(d => d.Amount ?? 0) })
+                .OrderByDescending(x => x.TotalAmount)
+                .Take(limit)
+                .ToListAsync();
+
+            return result
+                .ToDictionary(x => x.CampaignId, x => x.TotalAmount);
+        }
+
+        public async Task<Dictionary<DateTime, double>> GetDonationsTrendAsync(int days = 30)
+        {
+            var startDate = DateTime.Now.AddDays(-days).Date;
+
+            var trend = await _context.Donations
+                .Where(d => (d.IsDeleted == false) &&
+                           d.RegistrationDate >= startDate)
+                .GroupBy(d => d.RegistrationDate.Date)
+                .Select(g => new { Date = g.Key, TotalAmount = g.Sum(d => d.Amount ?? 0) })
+                .OrderBy(x => x.Date)
+                .ToListAsync();
+
+            return trend.ToDictionary(x => x.Date, x => x.TotalAmount);
+        }
+
+        public async Task<Dictionary<string, int>> GetDonationFrequencyByUserAsync()
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Select(g => new { UserId = g.Key, Frequency = g.Count() })
+                .OrderByDescending(x => x.Frequency)
+                .ToListAsync();
+
+            return result
+                .Where(x => !string.IsNullOrEmpty(x.UserId))
+                .ToDictionary(x => x.UserId, x => x.Frequency);
+        }
+
+        // ===== Campaign-Specific Operations =====
+        public async Task<double> GetCampaignTotalRaisedAsync(int campaignId)
+        {
+            return await GetTotalDonationsAmountByCampaignAsync(campaignId);
+        }
+
+        public async Task<double> GetCampaignProgressPercentageAsync(int campaignId)
+        {
+            var campaign = await _context.Campaigns
+                .Where(c => c.Id == campaignId &&
+                           (c.IsDeleted == false))
+                .FirstOrDefaultAsync();
+
+            if (campaign == null || !campaign.Target.HasValue || campaign.Target.Value == 0)
+                return 0;
+
+            var totalRaised = await GetCampaignTotalRaisedAsync(campaignId);
+            return (totalRaised / campaign.Target.Value) * 100;
+        }
+
+        public async Task<IEnumerable<Donation>> GetUsersDonationsOfACampaignAsync(int campaignId)
+        {
+            return await _context.Donations
+                .Where(d => d.CampaignId == campaignId &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .OrderByDescending(d => d.Amount)
+                .ToListAsync();
+        }
+
+        // ===== User-Specific Operations =====
+        public async Task<IEnumerable<Donation>> GetUserDonationHistoryAsync(string userId)
+        {
+            return await GetDonationsByUserAsync(userId);
+        }
+
+        public async Task<DateTime?> GetUserLastDonationDateAsync(string userId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           (d.IsDeleted == false))
+                .OrderByDescending(d => d.RegistrationDate)
+                .Select(d => d.RegistrationDate)
+                .FirstOrDefaultAsync();
+        }
+
+        public async Task<IEnumerable<int>> GetCampaignsDonatedByUserAsync(string userId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           (d.IsDeleted == false))
+                .Select(d => d.CampaignId)
+                .Distinct()
+                .ToListAsync();
+        }
+
+        // ===== Bulk Operations =====
+        public async Task<int> TransferDonationsToCampaignAsync(int fromCampaignId, int toCampaignId)
+        {
+            var donations = await _context.Donations
+                .Where(d => d.CampaignId == fromCampaignId &&
+                           (d.IsDeleted == false))
+                .ToListAsync();
+
+            foreach (var donation in donations)
+            {
+                donation.EditCampaign(toCampaignId);
+            }
+
+            await _context.SaveChangesAsync();
+            return donations.Count;
+        }
+
+        public async Task<int> DeleteOldDonationsAsync(int daysOld = 365)
+        {
+            var cutoffDate = DateTime.Now.AddDays(-daysOld);
+
+            var donations = await _context.Donations
+                .Where(d => (d.IsDeleted == false) &&
+                           d.RegistrationDate < cutoffDate)
+                .ToListAsync();
+
+            foreach (var donation in donations)
+            {
+                donation.Delete();
+            }
+
+            await _context.SaveChangesAsync();
+            return donations.Count;
+        }
+
+        // ===== Validation & Checks =====
+        public async Task<bool> DonationExistsAsync(int id)
+        {
+            return await _context.Donations.AnyAsync(d => d.Id == id);
+        }
+
+        public async Task<bool> HasUserDonatedToCampaignAsync(string userId, int campaignId)
+        {
+            return await _context.Donations
+                .AnyAsync(d => d.UserId == userId &&
+                              d.CampaignId == campaignId &&
+                              (d.IsDeleted == false));
+        }
+
+        public async Task<bool> IsDonationValidAsync(Donation donation)
+        {
+            // Check if user exists
+            var userExists = await _context.Users.AnyAsync(u => u.Id == donation.UserId);
+            if (!userExists) return false;
+
+            var campaignExists = await _context.Campaigns
+                .AnyAsync(c => c.Id == donation.CampaignId);
+            if (!campaignExists) return false;
+
+            // Check amount
+            if (!donation.Amount.HasValue || donation.Amount.Value <= 0)
+                return false;
+
+            return true;
+        }
+
+        // ===== Eager Loading =====
+        public async Task<Donation?> GetDonationWithDetailsAsync(int id)
+        {
+            return await _context.Donations
+                .Where(d => d.Id == id && (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .FirstOrDefaultAsync();
+        }
+
+        // ===== Dashboard & Reporting =====
+        public async Task<IEnumerable<Donation>> GetLatestDonationsAsync(int limit = 10)
+        {
+            return await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .Take(limit)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetLargestDonationsAsync(int limit = 10)
+        {
+            return await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.Amount)
+                .Take(limit)
+                .ToListAsync();
+        }
+
+        public async Task<Dictionary<int, int>> GetDonationsPerCampaignCountAsync()
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.CampaignId)
+                .Select(g => new { CampaignId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return result
+                .ToDictionary(x => x.CampaignId, x => x.Count);
+        }
+
+        public async Task<Dictionary<string, int>> GetDonationsPerUserCountAsync()
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Select(g => new { UserId = g.Key, Count = g.Count() })
+                .ToListAsync();
+
+            return result
+                .Where(x => !string.IsNullOrEmpty(x.UserId))
+                .ToDictionary(x => x.UserId, x => x.Count);
+        }
+
+        public async Task<double> GetTodayDonationsTotalAsync()
+        {
+            var today = DateTime.Now.Date;
+            var tomorrow = today.AddDays(1);
+
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= today &&
+                           d.RegistrationDate < tomorrow &&
+                           (d.IsDeleted == false))
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        public async Task<double> GetThisWeekDonationsTotalAsync()
+        {
+            var startOfWeek = DateTime.Now.Date.AddDays(-(int)DateTime.Now.DayOfWeek);
+            var endOfWeek = startOfWeek.AddDays(7);
+
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= startOfWeek &&
+                           d.RegistrationDate < endOfWeek &&
+                           (d.IsDeleted == false))
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        public async Task<double> GetThisMonthDonationsTotalAsync()
+        {
+            var startOfMonth = new DateTime(DateTime.Now.Year, DateTime.Now.Month, 1);
+            var endOfMonth = startOfMonth.AddMonths(1);
+
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= startOfMonth &&
+                           d.RegistrationDate < endOfMonth &&
+                           (d.IsDeleted == false))
+                .SumAsync(d => d.Amount ?? 0);
+        }
+
+        // ===== Financial Reporting =====
+        public async Task<Dictionary<string, double>> GetMonthlyDonationsReportAsync(int year)
+        {
+            var result = new Dictionary<string, double>();
+
+            for (int month = 1; month <= 12; month++)
+            {
+                var startDate = new DateTime(year, month, 1);
+                var endDate = startDate.AddMonths(1);
+
+                var monthlyTotal = await _context.Donations
+                    .Where(d => d.RegistrationDate >= startDate &&
+                               d.RegistrationDate < endDate &&
+                               (d.IsDeleted == false))
+                    .SumAsync(d => d.Amount ?? 0);
+
+                result.Add(startDate.ToString("MMMM"), monthlyTotal);
+            }
+
+            return result;
+        }
+
+        public async Task<Dictionary<string, double>> GetQuarterlyDonationsReportAsync(int year)
+        {
+            var result = new Dictionary<string, double>();
+
+            for (int quarter = 1; quarter <= 4; quarter++)
+            {
+                var startMonth = (quarter - 1) * 3 + 1;
+                var startDate = new DateTime(year, startMonth, 1);
+                var endDate = startDate.AddMonths(3);
+
+                var quarterlyTotal = await _context.Donations
+                    .Where(d => d.RegistrationDate >= startDate &&
+                               d.RegistrationDate < endDate &&
+                               (d.IsDeleted == false))
+                    .SumAsync(d => d.Amount ?? 0);
+
+                result.Add($"Q{quarter}", quarterlyTotal);
+            }
+
+            return result;
+        }
+
+        public async Task<Dictionary<string, double>> GetYearlyDonationsReportAsync(int yearsBack = 5)
+        {
+            var result = new Dictionary<string, double>();
+            var currentYear = DateTime.Now.Year;
+
+            for (int i = 0; i < yearsBack; i++)
+            {
+                var year = currentYear - i;
+                var startDate = new DateTime(year, 1, 1);
+                var endDate = new DateTime(year + 1, 1, 1);
+
+                var yearlyTotal = await _context.Donations
+                    .Where(d => d.RegistrationDate >= startDate &&
+                               d.RegistrationDate < endDate &&
+                               (d.IsDeleted == false))
+                    .SumAsync(d => d.Amount ?? 0);
+
+                result.Add(year.ToString(), yearlyTotal);
+            }
+
+            return result;
+        }
+
+        public async Task<Dictionary<string, double>> GetDonationsByTimeOfDayAsync()
+        {
+            var donations = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .ToListAsync();
+
+            var result = new Dictionary<string, double>
+            {
+                { "Morning (6AM-12PM)", 0 },
+                { "Afternoon (12PM-6PM)", 0 },
+                { "Evening (6PM-12AM)", 0 },
+                { "Night (12AM-6AM)", 0 }
+            };
+
+            foreach (var donation in donations)
+            {
+                var hour = donation.RegistrationDate.Hour;
+                var amount = donation.Amount ?? 0;
+
+                if (hour >= 6 && hour < 12)
+                    result["Morning (6AM-12PM)"] += amount;
+                else if (hour >= 12 && hour < 18)
+                    result["Afternoon (12PM-6PM)"] += amount;
+                else if (hour >= 18 && hour < 24)
+                    result["Evening (6PM-12AM)"] += amount;
+                else
+                    result["Night (12AM-6AM)"] += amount;
+            }
+
+            return result;
+        }
+
+        public async Task<Dictionary<string, double>> GetDonationsByDayOfWeekAsync()
+        {
+            var donations = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .ToListAsync();
+
+            var result = new Dictionary<string, double>
+            {
+                { "Monday", 0 },
+                { "Tuesday", 0 },
+                { "Wednesday", 0 },
+                { "Thursday", 0 },
+                { "Friday", 0 },
+                { "Saturday", 0 },
+                { "Sunday", 0 }
+            };
+
+            foreach (var donation in donations)
+            {
+                var day = donation.RegistrationDate.DayOfWeek.ToString();
+                var amount = donation.Amount ?? 0;
+
+                if (result.ContainsKey(day))
+                    result[day] += amount;
+            }
+
+            return result;
+        }
+
+        // ===== Campaign Performance =====
+        public async Task<Dictionary<DateTime, double>> GetCampaignDonationTimelineAsync(int campaignId)
+        {
+            var donations = await GetDonationsByCampaignAsync(campaignId);
+
+            return donations
+                .GroupBy(d => d.RegistrationDate.Date)
+                .OrderBy(g => g.Key)
+                .ToDictionary(g => g.Key, g => g.Sum(d => d.Amount ?? 0));
+        }
+
+        // ===== User Engagement =====
+        public async Task<IEnumerable<Donation>> GetRecurringDonorsAsync(int minDonations = 3)
+        {
+            var recurringUserIds = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Where(g => g.Count() >= minDonations)
+                .Select(g => g.Key)
+                .ToListAsync();
+
+            var result = new List<Donation>();
+
+            foreach (var userId in recurringUserIds)
+            {
+                var userDonations = await GetDonationsByUserAsync(userId);
+                result.AddRange(userDonations);
+            }
+
+            return result;
+        }
+
+        public async Task<IEnumerable<Donation>> GetFirstTimeDonorsAsync(DateTime startDate, DateTime endDate)
+        {
+            // Get all donations in date range
+            var donationsInRange = await GetDonationsByDateRangeAsync(startDate, endDate);
+
+            // Get users who donated before the start date
+            var existingDonors = await _context.Donations
+                .Where(d => d.RegistrationDate < startDate &&
+                           (d.IsDeleted == false))
+                .Select(d => d.UserId)
+                .Distinct()
+                .ToListAsync();
+
+            // Filter donations to only include first-time donors
+            return donationsInRange
+                .Where(d => !existingDonors.Contains(d.UserId))
+                .ToList();
+        }
+
+        public async Task<Dictionary<string, double>> GetUserLifetimeValueAsync()
+        {
+            var result = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Select(g => new { UserId = g.Key, LifetimeValue = g.Sum(d => d.Amount ?? 0) })
+                .OrderByDescending(x => x.LifetimeValue)
+                .ToListAsync();
+
+            return result
+                .Where(x => !string.IsNullOrEmpty(x.UserId))
+                .ToDictionary(x => x.UserId, x => x.LifetimeValue);
+        }
+
+        public async Task<IEnumerable<string>> GetLoyalDonorsAsync(double minTotalAmount = 1000, int minDonations = 5)
+        {
+            var loyalDonors = await _context.Donations
+                .Where(d => d.IsDeleted == false)
+                .GroupBy(d => d.UserId)
+                .Select(g => new
+                {
+                    UserId = g.Key,
+                    TotalAmount = g.Sum(d => d.Amount ?? 0),
+                    DonationCount = g.Count()
+                })
+                .Where(x => x.TotalAmount >= minTotalAmount && x.DonationCount >= minDonations)
+                .Select(x => x.UserId)
+                .ToListAsync();
+
+            return loyalDonors.Where(id => !string.IsNullOrEmpty(id));
+        }
+
+        // ===== Search & Filter Combinations =====
+        public async Task<IEnumerable<Donation>> SearchDonationsByUserAndCampaignAsync(string userId, int campaignId)
+        {
+            return await _context.Donations
+                .Where(d => d.UserId == userId &&
+                           d.CampaignId == campaignId &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByMultipleUsersAsync(IEnumerable<string> userIds)
+        {
+            return await _context.Donations
+                .Where(d => userIds.Contains(d.UserId) &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByMultipleCampaignsAsync(IEnumerable<int> campaignIds)
+        {
+            return await _context.Donations
+                .Where(d => campaignIds.Contains(d.CampaignId) &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.RegistrationDate)
+                .ToListAsync();
+        }
+
+        public async Task<IEnumerable<Donation>> GetDonationsByAmountAndDateAsync(double minAmount, DateTime startDate)
+        {
+            return await _context.Donations
+                .Where(d => d.Amount >= minAmount &&
+                           d.RegistrationDate >= startDate &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.Amount)
+                .ToListAsync();
+        }
+
+        // ===== Audit & Reconciliation =====
+
+        public async Task<IEnumerable<Donation>> GetSuspiciousDonationsAsync(double amountThreshold = 10000)
+        {
+            return await _context.Donations
+                .Where(d => d.Amount >= amountThreshold &&
+                           (d.IsDeleted == false))
+                .Include(d => d.User)
+                .Include(d => d.Campaign)
+                .OrderByDescending(d => d.Amount)
+                .ToListAsync();
+        }
+
+        // ===== Export & Data Management =====
+        public async Task<int> GetDonationRecordCountForPeriodAsync(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Donations
+                .Where(d => d.RegistrationDate >= startDate &&
+                           d.RegistrationDate <= endDate &&
+                           (d.IsDeleted == false))
+                .CountAsync();
+        }
+    }
+}
