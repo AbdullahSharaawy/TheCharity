@@ -13,7 +13,10 @@ namespace TheCharityDAL.Entities
 
         [ForeignKey(nameof(PaymentId))]
         public PaymentInfo? PaymentInfo { get; private set; }
-        public virtual ICollection<Campaign> Campaigns { get; private set; } = new List<Campaign>();
+        public virtual ICollection<SoloCampaign> SoloCampaigns { get; set; } = new List<SoloCampaign>();
+        public virtual ICollection<SharedCampaign> SharedCampaigns { get; set; } = new List<SharedCampaign>();
+        public IEnumerable<Campaign> Campaigns =>
+            SoloCampaigns.Cast<Campaign>().Concat(SharedCampaigns.Cast<Campaign>());
         public virtual ICollection<OrganizationContactMethod> ContactMethods { get; private set; } = new List<OrganizationContactMethod>();
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }

@@ -260,9 +260,17 @@ namespace TheCharityDAL.Repositories.Implementation
         public async Task<IEnumerable<Organization>> GetOrganizationsByCampaignCountAsync(int minCampaigns = 1)
         {
             return await _context.Organizations
-                .Where(o => (o.IsDeleted == false) &&
-                           o.Campaigns != null && o.Campaigns.Count >= minCampaigns)
-                .ToListAsync();
+        .Where(o => !o.IsDeleted)
+        .Select(o => new
+        {
+            Organization = o,
+            CampaignCount = o.SoloCampaigns.Count() + o.SharedCampaigns.Count()
+        })
+        .Where(x => x.CampaignCount >= minCampaigns)
+        .Select(x => x.Organization)
+        .Include(o => o.SoloCampaigns.Where(c => !c.IsDeleted))
+        .Include(o => o.SharedCampaigns.Where(c => !c.IsDeleted))
+        .ToListAsync();
         }
 
         // ===== Validation & Checks =====
