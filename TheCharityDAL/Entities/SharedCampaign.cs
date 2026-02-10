@@ -8,6 +8,7 @@ namespace TheCharityDAL.Entities
         public SharedCampaign(string? title, string? description, string? imgPath, int? target, int? achieved, CampaignStatus? status, CampaignType? type) : base(title, description, imgPath, target, achieved, status, type)
         {
         }
+        private SharedCampaign() { }
         public void AddOrganization(Organization? organization)
         {
             if (!(organization == null))

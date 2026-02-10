@@ -19,8 +19,8 @@ namespace TheCharityDAL.Entities
 
         [ForeignKey(nameof(DonatedItemId))]
         public DonatedItem? DonatedItem { get; private set; }
-        public Attachment(int? itemId, string? name, string? path, long? fileSize, string? contentType, bool isItemAttachment = true) { 
-            this.DonatedItemId = itemId;
+        public Attachment(int? donatedItemId, string? name, string? path, long? fileSize, string? contentType, bool isItemAttachment = true) { 
+            this.DonatedItemId = donatedItemId;
             this.Name = name;
             this.Path = path;
             this.FileSize = fileSize;

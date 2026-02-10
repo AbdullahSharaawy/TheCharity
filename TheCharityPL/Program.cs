@@ -1,4 +1,3 @@
-using TheCharityBLL.Helpers;
 using TheCharityBLL.Services;
 namespace TheCharityPL
 {
@@ -10,6 +9,7 @@ namespace TheCharityPL
 
             builder.Services.TheCharityEnhancedConnectionString(builder.Configuration);
             builder.Services.TheCharityDependencyInjection();
+            builder.Services.TheCharityIdentity();
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

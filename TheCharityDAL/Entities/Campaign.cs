@@ -13,6 +13,7 @@ namespace TheCharityDAL.Entities
         public double? Achieved { get; private set; } = 0;
         public CampaignStatus? Status { get; private set; } = CampaignStatus.Active;
         public CampaignType? Type { get; private set; }
+        public virtual int? OrganizationId { get; protected set; }
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
         public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
@@ -26,6 +27,7 @@ namespace TheCharityDAL.Entities
             this.Status = status;
             this.Type = type;
         }
+        protected Campaign() { }
         public void EditTitle(string? title)
         {
             if (!title.IsNullOrEmpty())

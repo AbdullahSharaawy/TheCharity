@@ -18,7 +18,7 @@ namespace TheCharityDAL.Entities
         public DateTime? DeletedOn { get; private set; }
         public DateTime RegistrationDate { get; private set; } = DateTime.Now;
         public DateTime? UpdatedOn { get; private set; }
-        public Donation(int? amount, string userId, int campaignId)
+        public Donation(double? amount, string userId, int campaignId)
         {
             this.Amount = amount;
             this.UserId = userId;
