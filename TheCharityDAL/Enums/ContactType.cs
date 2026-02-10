@@ -2,9 +2,6 @@
 {
     public enum ContactType
     {
-        PhoneNumber,
-        Fax,
-        Email,
-        SocialMedia
+        Phone, Email, SocialMedia, Mobile, Fax, Website
     }
 }

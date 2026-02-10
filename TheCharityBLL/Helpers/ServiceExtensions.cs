@@ -7,7 +7,7 @@ using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
 using TheCharityDAL.Repositories.Implementation;
 
-namespace TheCharityBLL.Services
+namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions
     {
