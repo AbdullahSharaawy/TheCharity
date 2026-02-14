@@ -7,7 +7,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCharityBLL", "TheCharity
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheCharityDAL", "TheCharityDAL\TheCharityDAL.csproj", "{BB816819-A2A8-4C10-A9F3-EBE8F8FAEEA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCharityPL", "TheCharityPL\TheCharityPL.csproj", "{E535640E-BB13-416D-8691-C07440712868}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheCharityPL", "TheCharityPL\TheCharityPL.csproj", "{9CEC6EEC-4215-4828-842D-3CD425DDBA26}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{BB816819-A2A8-4C10-A9F3-EBE8F8FAEEA3}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB816819-A2A8-4C10-A9F3-EBE8F8FAEEA3}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB816819-A2A8-4C10-A9F3-EBE8F8FAEEA3}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E535640E-BB13-416D-8691-C07440712868}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E535640E-BB13-416D-8691-C07440712868}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E535640E-BB13-416D-8691-C07440712868}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E535640E-BB13-416D-8691-C07440712868}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9CEC6EEC-4215-4828-842D-3CD425DDBA26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9CEC6EEC-4215-4828-842D-3CD425DDBA26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9CEC6EEC-4215-4828-842D-3CD425DDBA26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9CEC6EEC-4215-4828-842D-3CD425DDBA26}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

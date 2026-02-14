@@ -10,7 +10,7 @@ namespace TheCharityDAL.Database
             var optionsBuilder = new DbContextOptionsBuilder<TheCharityDbContext>();
 
             // Hardcode your connection string here for migrations
-            optionsBuilder.UseSqlServer("Data Source=DESKTOP-6T7MQMA;Initial Catalog=TheCharity;Integrated Security=True;Encrypt=False;Trust Server Certificate=True");
+            optionsBuilder.UseSqlServer("Server=.;Database=Charity;Integrated Security=True;TrustServerCertificate=True;");
 
             return new TheCharityDbContext(optionsBuilder.Options);
         }

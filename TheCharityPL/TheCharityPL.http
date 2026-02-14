@@ -1,4 +1,4 @@
-@TheCharityPL_HostAddress = http://localhost:5093
+@TheCharityPL_HostAddress = http://localhost:5277
 
 GET {{TheCharityPL_HostAddress}}/weatherforecast/
 Accept: application/json

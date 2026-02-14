@@ -13,6 +13,7 @@ namespace TheCharityBLL.Helpers
     {
         public static void TheCharityIdentity(this IServiceCollection services)
         {
+            services.AddDataProtection();
             services.AddIdentityCore<User>(options =>
             {
                 options.Password.RequireDigit = true;
@@ -21,7 +22,9 @@ namespace TheCharityBLL.Helpers
                 options.Password.RequireNonAlphanumeric = false;
                 options.Password.RequiredLength = 6;
             })
-            .AddEntityFrameworkStores<TheCharityDbContext>().AddDefaultTokenProviders();
+            .AddRoles<IdentityRole>()
+    .AddEntityFrameworkStores<TheCharityDbContext>()
+    .AddDefaultTokenProviders();
         }
         public static void TheCharityEnhancedConnectionString(this IServiceCollection services, IConfiguration configuration, string stringName = "defaultConnection")
         {
