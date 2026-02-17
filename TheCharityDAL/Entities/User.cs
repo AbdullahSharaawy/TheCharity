@@ -7,6 +7,7 @@ namespace TheCharityDAL.Entities
     {
         public string? ImgPath { get; private set; }
         public bool IsDeleted { get; private set; } = false;
+        public string? FullName { get; private set; } = "User";
         public DateTime? DeletedOn { get; private set; }
         public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
         public DateTime? UpdatedOn { get; private set; }
@@ -14,15 +15,16 @@ namespace TheCharityDAL.Entities
         public virtual ICollection<UserContactMethod> ContactMethods { get; private set; } = new List<UserContactMethod>();
         public User(string? userName, string? email, string? imgPath)
         {
-            this.UserName = userName;
+            this.UserName = email;// بقلك ايه انا ناقله من كريستين كدا
             this.Email = email;
             this.ImgPath = imgPath;
+            this.FullName = userName;
         }
         public void EditUsername(string? userName)
         {
             if (!userName.IsNullOrEmpty())
             {
-                this.UserName = userName;
+                this.FullName = userName;
                 this.UpdatedOn = DateTime.Now;
             }
         }
