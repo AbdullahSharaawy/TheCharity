@@ -5,30 +5,52 @@ namespace TheCharityDAL.Entities
     public class PaymentInfo
     {
         public int Id { get; private set; }
-        public string? ClientId { get; private set; }
-        public string? SecretKey { get; private set; }
+        public string? ApiKey { get; private set; }
+        public string? IntegrationId { get; private set; }
+
+        public string? IframeId { get; private set; }
+        public string? HmacKey { get; private set; }
+
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
         public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
         public DateTime? UpdatedOn { get; private set; }
-        public PaymentInfo(string clientId, string secretKey)
+        public PaymentInfo( string? apiKey, string? integrationId, string? iframeId, string? hmacKey)
         {
-            this.ClientId = clientId;
-            this.SecretKey = secretKey;
+              ApiKey = apiKey;
+            IntegrationId = integrationId;
+            IframeId = iframeId;
+            HmacKey = hmacKey;
         }
-        public void EditClientId(string clientId)
+        public void EditApiKey(string clientId)
         {
             if (!clientId.IsNullOrEmpty())
             {
-                this.ClientId = clientId;
+                this.ApiKey = clientId;
                 this.UpdatedOn = DateTime.Now;
             }
         }
-        public void EditSecretKey(string secretKey)
+        public void EditIntegrationId(string secretKey)
         {
             if (!secretKey.IsNullOrEmpty())
             {
-                this.SecretKey = secretKey;
+                this.IntegrationId = secretKey;
+                this.UpdatedOn = DateTime.Now;
+            }
+        }
+        public void EditIframeId(string secretKey)
+        {
+            if (!secretKey.IsNullOrEmpty())
+            {
+                this.IframeId = secretKey;
+                this.UpdatedOn = DateTime.Now;
+            }
+        }
+        public void EditHmacKey(string secretKey)
+        {
+            if (!secretKey.IsNullOrEmpty())
+            {
+                this.HmacKey = secretKey;
                 this.UpdatedOn = DateTime.Now;
             }
         }

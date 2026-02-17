@@ -376,8 +376,12 @@ namespace TheCharityDAL.Repositories.Implementation
         {
             var paymentInfo = await GetPaymentInfoByOrganizationIdAsync(organizationId);
             return paymentInfo != null &&
-                   !string.IsNullOrEmpty(paymentInfo.ClientId) &&
-                   !string.IsNullOrEmpty(paymentInfo.SecretKey);
+                   !string.IsNullOrEmpty(paymentInfo.ApiKey) &&
+                   !string.IsNullOrEmpty(paymentInfo.HmacKey)
+                   &&
+                   !string.IsNullOrEmpty(paymentInfo.IntegrationId)
+                   &&
+                   !string.IsNullOrEmpty(paymentInfo.IframeId);
         }
 
         public async Task<IEnumerable<Organization>> GetOrganizationsWithValidPaymentInfoAsync()
