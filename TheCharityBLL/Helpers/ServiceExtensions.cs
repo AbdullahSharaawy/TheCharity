@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Diagnostics.HealthChecks;
 using TheCharityDAL.Database;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
@@ -30,7 +31,17 @@ namespace TheCharityBLL.Helpers
         {
             var connectionString = configuration.GetConnectionString(stringName);
             services.AddDbContext<TheCharityDbContext>(options =>
-                options.UseSqlServer(connectionString));
+                options.UseSqlServer(
+                    connectionString,
+                    b => b.MigrationsAssembly("TheCharityDAL")
+                    ));
+            services.AddHealthChecks()
+        .AddSqlServer(
+            connectionString: connectionString,
+            name: "TheCharity-DB",
+            failureStatus: HealthStatus.Unhealthy,
+            tags: new[] { "db", "sql", "charity" }
+        );
         }
         public static void TheCharityDependencyInjection(this IServiceCollection services)
         {

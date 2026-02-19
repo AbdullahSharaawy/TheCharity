@@ -8,6 +8,9 @@ namespace TheCharityDAL.Database
     {
         public TheCharityDbContext(DbContextOptions<TheCharityDbContext> options) : base(options)
         { }
+        public TheCharityDbContext() { }
+
+        
         public DbSet<Attachment> Attachments { get; set; }
         public DbSet<Campaign> Campaigns { get; set; }
         public DbSet<DonatedItem> DonatedItems { get; set; }
