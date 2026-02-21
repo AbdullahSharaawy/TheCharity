@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using TheCharityDAL.Database;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
@@ -12,7 +15,7 @@ namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions
     {
-        public static void TheCharityIdentity(this IServiceCollection services)
+        public static void TheCharityIdentity(this IServiceCollection services, IConfiguration Configuration)
         {
             services.AddDataProtection();
             services.AddIdentityCore<User>(options =>
@@ -24,8 +27,29 @@ namespace TheCharityBLL.Helpers
                 options.Password.RequiredLength = 6;
             })
             .AddRoles<IdentityRole>()
-    .AddEntityFrameworkStores<TheCharityDbContext>()
-    .AddDefaultTokenProviders();
+            .AddEntityFrameworkStores<TheCharityDbContext>()
+            .AddDefaultTokenProviders();
+
+           services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+           .AddJwtBearer(options =>
+           {
+           options.TokenValidationParameters = new TokenValidationParameters
+           {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = Configuration["Jwt:Issuer"],
+                ValidAudience = Configuration["Jwt:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
+           };
+           }
+           );
+           
         }
         public static void TheCharityEnhancedConnectionString(this IServiceCollection services, IConfiguration configuration, string stringName = "defaultConnection")
         {

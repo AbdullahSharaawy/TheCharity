@@ -13,6 +13,10 @@ namespace TheCharityDAL.Entities
         public DateTime? UpdatedOn { get; private set; }
         public string? Address { get; private set; }
         public virtual ICollection<UserContactMethod> ContactMethods { get; private set; } = new List<UserContactMethod>();
+        public long StorageOwned { get; private set; } = 2000 * 1024 * 1024; // in bytes
+        public DateTime? LastStorageUpdate { get; private set; }
+
+
         public User(string? userName, string? email, string? imgPath)
         {
             this.UserName = email;// بقلك ايه انا ناقله من كريستين كدا
