@@ -9,48 +9,26 @@ namespace TheCharityDAL.Repositories.Implementation
     public class UserRepository : IUserRepository
     {
         private readonly UserManager<User> _userManager;
+
         private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly TheCharityDbContext _context;
-
         public UserRepository(
-            UserManager<User> userManager,
-            RoleManager<IdentityRole> roleManager,
-            TheCharityDbContext context)
+             UserManager<User> userManager,
+             RoleManager<IdentityRole> roleManager)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _context = context;
+            _userManager = userManager ?? throw new ArgumentNullException(nameof(userManager));
+            _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
-        // Create user with password
-        public async Task<IdentityResult> CreateUserAsync(User user, string password)
-        {
-            return await _userManager.CreateAsync(user, password);
-        }
 
-        // Update user
-        public async Task<IdentityResult> UpdateUserAsync(User user)
+        public async Task<IdentityResult> AddToRoleAsync(string userId, string role)
         {
-            return await _userManager.UpdateAsync(user);
-        }
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
 
-        // Delete user
-        public async Task<IdentityResult> DeleteUserAsync(User user)
-        {
-            user.Delete();
-            return await _userManager.UpdateAsync(user);
-        }
-
-        // Change password
-        public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
-        {
-            return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
-        }
-
-        // Add user to role
-        public async Task<IdentityResult> AddToRoleAsync(User user, string role)
-        {
-            // Ensure role exists
+            // Create role if it doesn't exist
             if (!await _roleManager.RoleExistsAsync(role))
             {
                 await _roleManager.CreateAsync(new IdentityRole(role));
@@ -59,146 +37,167 @@ namespace TheCharityDAL.Repositories.Implementation
             return await _userManager.AddToRoleAsync(user, role);
         }
 
-        // Remove user from role
-        public async Task<IdentityResult> RemoveFromRoleAsync(User user, string role)
+        public async Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword)
         {
-            return await _userManager.RemoveFromRoleAsync(user, role);
+            return await _userManager.ChangePasswordAsync(user, currentPassword, newPassword);
         }
 
-        // Get user by ID
-        public async Task<User?> GetUserByIdAsync(string id)
-        {
-            return await _userManager.Users
-                .Where(u => u.Id == id && !u.IsDeleted)
-                .Include(u => u.ContactMethods.Where(cm => !cm.IsDeleted))
-                .FirstOrDefaultAsync();
-        }
-
-        // Get user by username
-        public async Task<User?> GetUserByUsernameAsync(string username)
-        {
-            return await _userManager.Users
-                .Where(u => u.UserName == username && !u.IsDeleted)
-                .Include(u => u.ContactMethods.Where(cm => !cm.IsDeleted))
-                .FirstOrDefaultAsync();
-        }
-
-        // Get user by email
-        public async Task<User?> GetUserByEmailAsync(string email)
-        {
-            return await _userManager.Users
-                .Where(u => u.Email == email && !u.IsDeleted)
-                .Include(u => u.ContactMethods.Where(cm => !cm.IsDeleted))
-                .FirstOrDefaultAsync();
-        }
-
-        // Get all users (excluding deleted)
-        public async Task<IEnumerable<User>> GetAllUsersAsync()
-        {
-            return await _userManager.Users
-                .Where(u => !u.IsDeleted)
-                .Include(u => u.ContactMethods.Where(cm => !cm.IsDeleted))
-                .ToListAsync();
-        }
-
-        // Get users in a specific role
-        public async Task<IEnumerable<User>> GetUsersInRoleAsync(string role)
-        {
-            return await _userManager.GetUsersInRoleAsync(role);
-        }
-
-        // Check password
         public async Task<bool> CheckPasswordAsync(User user, string password)
         {
             return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        // Check if user is in role
-        public async Task<bool> IsInRoleAsync(User user, string role)
+        public async Task<bool> CheckPasswordAsync(string userId, string password)
         {
-            return await _userManager.IsInRoleAsync(user, role);
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null) return false;
+
+            return await _userManager.CheckPasswordAsync(user, password);
         }
 
-        // Contact methods (if you still need these)
-        public async Task<IEnumerable<UserContactMethod>> GetUserContactMethodsAsync(string userId)
+        public async Task<IdentityResult> CreateUserAsync(User user, string password)
         {
-            return await _context.UserContactMethods
-                .Where(cm => cm.UserId == userId && !cm.IsDeleted)
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return await _userManager.CreateAsync(user, password);
+        }
+
+        public async Task<IdentityResult> DeleteUserAsync(User user)
+        {
+            user.Delete();
+            return await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<IEnumerable<User>?> GetAllUsersAsync()
+        {
+            return await _userManager.Users
                 .ToListAsync();
         }
 
-        public async Task<UserContactMethod> AddContactMethodAsync(UserContactMethod contactMethod)
+        public async Task<User?> GetUserByIdAsync(string id)
         {
-            _context.UserContactMethods.Add(contactMethod);
-            await _context.SaveChangesAsync();
-            return contactMethod;
+            return await _userManager.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
-        public async Task UpdateContactMethodAsync(UserContactMethod contactMethod)
+        public async Task<IList<string>> GetUserRolesAsync(string userId)
         {
-            _context.Entry(contactMethod).State = EntityState.Modified;
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task DeleteContactMethodAsync(int contactMethodId)
-        {
-            var contactMethod = await _context.UserContactMethods
-                .FindAsync(contactMethodId);
-
-            if (contactMethod != null)
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                contactMethod.Delete();
-                await _context.SaveChangesAsync();
+                return new List<string>();
             }
+
+            return await _userManager.GetRolesAsync(user);
         }
 
-        // Token generation and confirmation
-        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        public async Task<bool> IsInRoleAsync(string userId, string role)
         {
-            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
-        }
-
-        public async Task<string> GeneratePasswordResetTokenAsync(User user)
-        {
-            return await _userManager.GeneratePasswordResetTokenAsync(user);
-        }
-
-        public async Task<IdentityResult> ConfirmEmailAsync(User user, string token)
-        {
-            return await _userManager.ConfirmEmailAsync(user, token);
-        }
-
-        public async Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword)
-        {
-            return await _userManager.ResetPasswordAsync(user, token, newPassword);
-        }
-
-        public async Task DeleteUserAsync(string id)
-        {
-            var user = await GetUserByIdAsync(id);
-            if (user != null)
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
             {
-                user.Delete();
-                await _userManager.UpdateAsync(user);
+                return false;
             }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+            return userRoles.Any(r => r.Equals(role, StringComparison.OrdinalIgnoreCase));
         }
 
-        public async Task RestoreUserAsync(string id)
+        public async Task<bool> IsUserDeletedAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            return user?.IsDeleted ?? true;
+        }
+
+
+
+
+
+
+        public async Task<IdentityResult> RemoveFromRoleAsync(string userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
+
+            return await _userManager.RemoveFromRoleAsync(user, role);
+        }
+
+        public async Task<IdentityResult> RestoreUserAsync(string id)
         {
             var user = await GetUserByIdAsync(id);
             if (user != null)
             {
                 user.Restore();
                 await _userManager.UpdateAsync(user);
+                return IdentityResult.Success;
             }
+            return IdentityResult.Failed(new IdentityError { Description = "User not found" });
         }
 
-        public async Task<IEnumerable<User>> GetDeletedUsersAsync()
+        public async Task<IdentityResult> UpdateUserAsync(User user)
         {
-            return await _userManager.Users
-                .Where(u => u.IsDeleted == true)
-                .Include(u => u.ContactMethods)
-                .ToListAsync();
+            if (user == null) throw new ArgumentNullException(nameof(user));
+            return await _userManager.UpdateAsync(user);
+        }
+
+        public async Task<bool> UserExistsAsync(string userId)
+        {
+            return await _userManager.Users.AnyAsync(u => u.Id == userId && u.IsDeleted == false);
+        }
+
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
+        {
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+        public async Task<string> GeneratePasswordResetTokenAsync(User user)
+        {
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+        public async Task<User?> GetUserByEmailAsync(string email)
+        {
+            return await _userManager.Users.FirstOrDefaultAsync(u => u.Email == email && u.IsDeleted == false);
+        }
+        public async Task<IdentityResult> ResetPasswordAsync(string userId, string token, string newPassword)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
+            return await _userManager.ResetPasswordAsync(user, token, newPassword);
+        }
+
+        public async Task<IdentityResult> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if (user == null)
+            {
+                return IdentityResult.Failed(new IdentityError { Description = "User not found" });
+            }
+            return await _userManager.ConfirmEmailAsync(user, token);
+        }
+        public async Task<long> GetUserMaxStorageAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return 0;
+            }
+            return user.StorageOwned;
+        }
+        ////////////new addations
+        public async Task AccessFailedAsync(User user)
+           => await _userManager.AccessFailedAsync(user);
+
+        public async Task ResetAccessFailedCountAsync(User user)
+            => await _userManager.ResetAccessFailedCountAsync(user);
+
+        public async Task<User?> FindByNameOrEmailAsync(string usernameOrEmail)
+        {
+            return await _userManager.FindByNameAsync(usernameOrEmail)
+                   ?? await _userManager.FindByEmailAsync(usernameOrEmail);
         }
     }
 }

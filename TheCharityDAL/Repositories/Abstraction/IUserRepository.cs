@@ -5,41 +5,42 @@ namespace TheCharityDAL.Repositories.Abstraction
 {
     public interface IUserRepository
     {
-        // Identity-based methods (returns IdentityResult)
+        // CRUD
         Task<IdentityResult> CreateUserAsync(User user, string password);
         Task<IdentityResult> UpdateUserAsync(User user);
+        Task<IdentityResult> DeleteUserAsync(User user);
+        Task<IdentityResult> RestoreUserAsync(string id);
 
-        // Original signature methods
-        Task DeleteUserAsync(string id);
-        Task RestoreUserAsync(string id);
-
-        // Other methods...
-        Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
-        Task<IdentityResult> AddToRoleAsync(User user, string role);
-        Task<IdentityResult> RemoveFromRoleAsync(User user, string role);
-
-        // Query methods
+        // Lookup
         Task<User?> GetUserByIdAsync(string id);
-        Task<User?> GetUserByUsernameAsync(string username);
         Task<User?> GetUserByEmailAsync(string email);
-        Task<IEnumerable<User>> GetAllUsersAsync();
-        Task<IEnumerable<User>> GetDeletedUsersAsync();
-        Task<IEnumerable<User>> GetUsersInRoleAsync(string role);
+        Task<User?> FindByNameOrEmailAsync(string usernameOrEmail);
+        Task<IEnumerable<User>?> GetAllUsersAsync();
+        Task<bool> UserExistsAsync(string userId);
+        Task<bool> IsUserDeletedAsync(string userId);
 
-        // Check methods
+        // Password
         Task<bool> CheckPasswordAsync(User user, string password);
-        Task<bool> IsInRoleAsync(User user, string role);
-
-        // Contact methods
-        Task<IEnumerable<UserContactMethod>> GetUserContactMethodsAsync(string userId);
-        Task<UserContactMethod> AddContactMethodAsync(UserContactMethod contactMethod);
-        Task UpdateContactMethodAsync(UserContactMethod contactMethod);
-        Task DeleteContactMethodAsync(int contactMethodId);
-
-        // Token generation
-        Task<string> GenerateEmailConfirmationTokenAsync(User user);
+        Task<bool> CheckPasswordAsync(string userId, string password);
+        Task<IdentityResult> ChangePasswordAsync(User user, string currentPassword, string newPassword);
+        Task<IdentityResult> ResetPasswordAsync(string userId, string token, string newPassword);
         Task<string> GeneratePasswordResetTokenAsync(User user);
-        Task<IdentityResult> ConfirmEmailAsync(User user, string token);
-        Task<IdentityResult> ResetPasswordAsync(User user, string token, string newPassword);
+
+        // Email
+        Task<IdentityResult> ConfirmEmailAsync(string email, string token);
+        Task<string> GenerateEmailConfirmationTokenAsync(User user);
+
+        // Roles
+        Task<IList<string>> GetUserRolesAsync(string userId);
+        Task<bool> IsInRoleAsync(string userId, string role);
+        Task<IdentityResult> AddToRoleAsync(string userId, string role);
+        Task<IdentityResult> RemoveFromRoleAsync(string userId, string role);
+
+        // Lockout (used by AuthService)
+        Task AccessFailedAsync(User user);
+        Task ResetAccessFailedCountAsync(User user);
+
+        // Storage
+        Task<long> GetUserMaxStorageAsync(string userId);
     }
 }

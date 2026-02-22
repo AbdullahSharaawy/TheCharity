@@ -17,12 +17,12 @@ namespace TheCharityDAL.Entities
         public DateTime? LastStorageUpdate { get; private set; }
 
 
-        public User(string? userName, string? email, string? imgPath)
+        public User(string? userName,string? FullName, string? email, string? imgPath)
         {
-            this.UserName = email;// بقلك ايه انا ناقله من كريستين كدا
+            this.UserName = userName;// بقلك ايه انا ناقله من كريستين كدا
             this.Email = email;
             this.ImgPath = imgPath;
-            this.FullName = userName;
+            this.FullName = FullName;
         }
         public void EditUsername(string? userName)
         {
