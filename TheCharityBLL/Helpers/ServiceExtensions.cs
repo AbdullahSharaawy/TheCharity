@@ -6,10 +6,14 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using TheCharityBLL.Services.Abstraction;
 using TheCharityDAL.Database;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
 using TheCharityDAL.Repositories.Implementation;
+using TheCharityBLL.Services.Repository;
+using TheCharityBLL.Mapper;
+using TheCharityBLL.Settings;
 
 namespace TheCharityBLL.Helpers
 {
@@ -51,6 +55,10 @@ namespace TheCharityBLL.Helpers
            );
            
         }
+        public static void FoxArtEmailConfiguration(this IServiceCollection services, IConfiguration configuration)
+        {
+            services.Configure<EmailSettings>(configuration.GetSection("EmailSettings"));
+        }
         public static void TheCharityEnhancedConnectionString(this IServiceCollection services, IConfiguration configuration, string stringName = "defaultConnection")
         {
             var connectionString = configuration.GetConnectionString(stringName);
@@ -69,11 +77,20 @@ namespace TheCharityBLL.Helpers
         }
         public static void TheCharityDependencyInjection(this IServiceCollection services)
         {
+            // Repository Injection
             services.AddScoped<ICampaignRepository, CampaignRepository>();
             services.AddScoped<IDonatedItemsRepository, DonatedItemsRepository>();
             services.AddScoped<IDonationRepository, DonationRepository>();
             services.AddScoped<IOrganizationRepository, OrganizationRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
+
+            // Services Injection
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IEmailService, EmailService>();
+
+            // mapper Injection
+            services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+
         }
         public static void ThirdPartyAuthentication(this IServiceCollection services)
         {

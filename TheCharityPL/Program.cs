@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using TheCharityBLL.Helpers;
 
 namespace TheCharityPL
@@ -11,12 +12,14 @@ namespace TheCharityPL
             builder.Services.TheCharityEnhancedConnectionString(builder.Configuration);
             builder.Services.TheCharityDependencyInjection();
             builder.Services.TheCharityIdentity(builder.Configuration);
+            builder.Services.FoxArtEmailConfiguration(builder.Configuration);
+
             // Add services to the container.
             builder.Services.AddControllers();
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
+            
             var app = builder.Build();
 
             app.MapHealthChecks("/health");

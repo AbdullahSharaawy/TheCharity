@@ -159,7 +159,7 @@ namespace TheCharityPL.Controllers
                 if (result.Succeeded)
                 {
                     var token = await _userService.GenerateEmailConfirmationTokenAsync(createUserDTO.Email);
-                    var confirmationLink = BuildFrontendLink("confirm-email", createUserDTO.Email, token);
+                    var confirmationLink = BuildFrontendLink("api/User/confirm-email", createUserDTO.Email, token);
                     await _emailService.SendEmailConfirmationAsync(createUserDTO.Email, confirmationLink);
 
                     return Ok(new { message = "Registration successful. Please check your email to confirm your account." });
@@ -236,7 +236,7 @@ namespace TheCharityPL.Controllers
                     return BadRequest(new { message = "Email is already confirmed." });
 
                 var token = await _userService.GenerateEmailConfirmationTokenAsync(email);
-                var confirmationLink = BuildFrontendLink("confirm-email", email, token);
+                var confirmationLink = BuildFrontendLink("api/User/confirm-email", email, token);
                 await _emailService.SendEmailConfirmationAsync(email, confirmationLink);
 
                 return Ok(new { message = "If the email exists, a confirmation link has been sent." });
@@ -250,16 +250,16 @@ namespace TheCharityPL.Controllers
 
         // ─── POST api/user/confirm-email ─────────────────────────────────────────────
 
-        [HttpPost("confirm-email")]
+        [HttpGet("confirm-email")]
         [AllowAnonymous]
-        public async Task<IActionResult> ConfirmEmail([FromBody] ConfirmEmailViewModel model)
+        public async Task<IActionResult> ConfirmEmail([FromQuery] string email, [FromQuery] string encodedToken)
         {
-            if (string.IsNullOrEmpty(model?.email) || string.IsNullOrEmpty(model?.encodedToken))
+            if (string.IsNullOrEmpty(email) || string.IsNullOrEmpty(encodedToken))
                 return BadRequest(new { message = "Email and token are required." });
 
             try
             {
-                var result = await _userService.ConfirmEmailAsync(model.email, model.encodedToken);
+                var result = await _userService.ConfirmEmailAsync(email, encodedToken);
 
                 if (result.Succeeded)
                     return Ok(new { message = "Email confirmed successfully." });
@@ -527,7 +527,7 @@ namespace TheCharityPL.Controllers
         {
             var frontendUrl = _configuration["FrontendUrl"];
             var encodedToken = Uri.EscapeDataString(token);
-            return $"{frontendUrl}/{path}?email={email}&token={encodedToken}";
+            return $"{frontendUrl}/{path}?email={email}&encodedToken={encodedToken}";
         }
     }
 }
