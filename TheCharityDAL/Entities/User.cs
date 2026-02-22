@@ -16,7 +16,7 @@ namespace TheCharityDAL.Entities
         public long StorageOwned { get; private set; } = 2000 * 1024 * 1024; // in bytes
         public DateTime? LastStorageUpdate { get; private set; }
 
-
+        private User() { }
         public User(string? userName,string? FullName, string? email, string? imgPath)
         {
             this.UserName = userName;// بقلك ايه انا ناقله من كريستين كدا
