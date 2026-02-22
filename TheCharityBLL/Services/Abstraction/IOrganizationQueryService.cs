@@ -1,23 +1,27 @@
 ﻿
+using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
+using TheCharityDAL.Enums;
 
 namespace TheCharityBLL.Services.Abstraction
 {
     public interface IOrganizationQueryService
     {
-        Task<IEnumerable<OrganizationResponseDto>> SearchOrganizations(string searchTerm);
-        Task<IEnumerable<OrganizationResponseDto>> GetDeletedOrganizations();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> SearchOrganizations(string searchTerm);
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetDeletedOrganizations();
 
         // Dashboard & Advanced Queries
-        Task<IEnumerable<OrganizationResponseDto>> GetByCampaignCount(int minCampaigns);
-        Task<IEnumerable<OrganizationResponseDto>> GetRecentlyRegisteredOrganizations(int days);
-        Task<IEnumerable<OrganizationResponseDto>> GetWithoutCampaigns();
-        Task<IEnumerable<OrganizationResponseDto>> GetWithoutPaymentInfo();
-        Task<IEnumerable<OrganizationResponseDto>> GetWithActiveCampaigns();
-        Task<IEnumerable<OrganizationResponseDto>> GetWithCompletedCampaigns();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetByCampaignCount(int minCampaigns);
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetRecentlyRegisteredOrganizations(int days);
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithoutCampaigns();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithoutPaymentInfo();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithActiveCampaigns();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithCompletedCampaigns();
+        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetByContactType(ContactType type);
+
 
         //Statistics
-        Task<int> GetTotalOrganizationsCount();
-        Task<int> GetActiveOrganizationsCount();
+        Task<ServiceResponce<int>> GetTotalOrganizationsCount();
+        Task<ServiceResponce<int>> GetActiveOrganizationsCount();
     }
 }
