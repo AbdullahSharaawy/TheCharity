@@ -1,18 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace TheCharityBLL.DTOs.PaymentDTOs
 {
-    using System.Text.Json.Serialization;
-
-    public class PaymobCallbackRequest
+    public class PaymobTransaction
     {
         [JsonPropertyName("id")]
-        public long TransactionId { get; set; }
+        public long Id { get; set; }
 
         [JsonPropertyName("pending")]
         public bool Pending { get; set; }
@@ -51,34 +46,37 @@ namespace TheCharityBLL.DTOs.PaymentDTOs
         public bool HasParentTransaction { get; set; }
 
         [JsonPropertyName("order")]
-        public PaymobOrder Order { get; set; }
+        public PaymobOrder? Order { get; set; }
 
         [JsonPropertyName("created_at")]
         public DateTime CreatedAt { get; set; }
 
         [JsonPropertyName("transaction_processed_callback_responses")]
-        public List<object> TransactionProcessedCallbackResponses { get; set; }
+        public List<object>? TransactionProcessedCallbackResponses { get; set; }
 
         [JsonPropertyName("currency")]
-        public string Currency { get; set; }
+        public string? Currency { get; set; }
 
         [JsonPropertyName("source_data")]
-        public SourceData SourceData { get; set; }
+        public SourceData? SourceData { get; set; }
 
         [JsonPropertyName("api_source")]
-        public string ApiSource { get; set; }
+        public string? ApiSource { get; set; }
 
         [JsonPropertyName("terminal_id")]
-        public object TerminalId { get; set; }
+        public object? TerminalId { get; set; }
 
         [JsonPropertyName("merchant_commission")]
         public decimal MerchantCommission { get; set; }
 
+        [JsonPropertyName("accept_fees")]
+        public decimal AcceptFees { get; set; }
+
         [JsonPropertyName("installment")]
-        public object Installment { get; set; }
+        public object? Installment { get; set; }
 
         [JsonPropertyName("discount_details")]
-        public List<object> DiscountDetails { get; set; }
+        public List<object>? DiscountDetails { get; set; }
 
         [JsonPropertyName("is_void")]
         public bool IsVoid { get; set; }
@@ -87,18 +85,58 @@ namespace TheCharityBLL.DTOs.PaymentDTOs
         public bool IsRefund { get; set; }
 
         [JsonPropertyName("data")]
-        public TransactionData Data { get; set; }
+        public TransactionData? Data { get; set; }
+
+        [JsonPropertyName("is_hidden")]
+        public bool IsHidden { get; set; }
+
+        [JsonPropertyName("payment_key_claims")]
+        public PaymentKeyClaims? PaymentKeyClaims { get; set; }
 
         [JsonPropertyName("error_occured")]
         public bool ErrorOccured { get; set; }
+
+        [JsonPropertyName("is_live")]
+        public bool IsLive { get; set; }
+
+        [JsonPropertyName("other_endpoint_reference")]
+        public object? OtherEndpointReference { get; set; }
+
+        [JsonPropertyName("refunded_amount_cents")]
+        public long RefundedAmountCents { get; set; }
+
+        [JsonPropertyName("source_id")]
+        public int SourceId { get; set; }
+
+        [JsonPropertyName("is_captured")]
+        public bool IsCaptured { get; set; }
+
+        [JsonPropertyName("captured_amount")]
+        public long CapturedAmount { get; set; }
+
+        [JsonPropertyName("merchant_staff_tag")]
+        public object? MerchantStaffTag { get; set; }
+
+        [JsonPropertyName("updated_at")]
+        public DateTime UpdatedAt { get; set; }
+
+        [JsonPropertyName("is_settled")]
+        public bool IsSettled { get; set; }
+
+        [JsonPropertyName("bill_balanced")]
+        public bool BillBalanced { get; set; }
+
+        [JsonPropertyName("is_bill")]
+        public bool IsBill { get; set; }
 
         [JsonPropertyName("owner")]
         public long Owner { get; set; }
 
         [JsonPropertyName("parent_transaction")]
-        public object ParentTransaction { get; set; }
+        public object? ParentTransaction { get; set; }
 
-        // Convenience properties
+        // Convenience property
+        [JsonIgnore]
         public long OrderId => Order?.Id ?? 0;
     }
 }
