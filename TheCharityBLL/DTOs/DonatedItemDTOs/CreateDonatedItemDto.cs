@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -25,6 +26,10 @@ namespace TheCharityBLL.DTOs.DonatedItemDTOs
         [Required(ErrorMessage = "Item category is required.")]
         [EnumDataType(typeof(ItemCategory), ErrorMessage = "Invalid item category.")]
         public ItemCategory? ItemCategory { get; set; }
+
+        /////
+        public List<IFormFile>? ImageFiles { get; set; }
+        public List<IFormFile>? AttachmentFiles { get; set; }
 
     }
 

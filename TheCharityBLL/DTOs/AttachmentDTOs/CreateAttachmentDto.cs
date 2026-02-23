@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -19,6 +20,7 @@ namespace TheCharityBLL.DTOs.AttachmentDTOs
         [Required(ErrorMessage = "Path is required.")]
         [MaxLength(1000, ErrorMessage = "Path cannot exceed 1000 characters.")]
         public string Path { get; set; }
+        public IFormFile FileUrl { get; set; }
 
         [Range(1, long.MaxValue, ErrorMessage = "FileSize must be a positive value.")]
         public long? FileSize { get; set; }

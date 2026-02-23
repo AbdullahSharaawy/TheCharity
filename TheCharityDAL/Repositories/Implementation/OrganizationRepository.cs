@@ -103,6 +103,13 @@ namespace TheCharityDAL.Repositories.Implementation
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<Organization>> GetOrganizationsDropDownAsync()
+        {
+            return await _context.Organizations
+                .Where(o => o.IsDeleted == false)
+                .ToListAsync();
+        }
+
         public async Task<IEnumerable<Organization>> GetOrganizationsByAddressAsync(string address)
         {
             return await _context.Organizations

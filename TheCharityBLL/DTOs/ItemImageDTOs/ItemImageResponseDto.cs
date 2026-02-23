@@ -11,6 +11,7 @@ namespace TheCharityBLL.DTOs.ItemImageDTOs
         public int Id { get; set; }
         public string Path { get; set; }
         public int DonatedItemId { get; set; }
+        public bool IsMain { get; set; }
         public DateTime RegistrationDate { get; set; }
         public DateTime? UpdatedOn { get; set; }
         public bool IsDeleted { get; set; }

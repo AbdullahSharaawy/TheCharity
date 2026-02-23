@@ -8,6 +8,7 @@ namespace TheCharityDAL.Repositories.Abstraction
         // ===== DonatedItem CRUD Operations =====
         Task<IEnumerable<DonatedItem>> GetAllDonatedItemsAsync(bool includeDeleted = false);
         Task<DonatedItem?> GetDonatedItemByIdAsync(int id);
+        //Task<DonatedItem?> GetDonatedItemByIdWithDetailsAsync(int id);
         Task<DonatedItem> AddDonatedItemAsync(DonatedItem donatedItem);
         Task<DonatedItem> UpdateDonatedItemAsync(DonatedItem donatedItem);
         Task DeleteDonatedItemAsync(int id);

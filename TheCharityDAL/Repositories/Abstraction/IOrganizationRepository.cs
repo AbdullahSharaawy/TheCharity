@@ -17,6 +17,7 @@ namespace TheCharityDAL.Repositories.Abstraction
         Task<Organization?> GetOrganizationByNameAsync(string name);
         Task<IEnumerable<Organization>> SearchOrganizationsAsync(string searchTerm);
         Task<IEnumerable<Organization>> GetDeletedOrganizationsAsync();
+        Task<IEnumerable<Organization>> GetOrganizationsDropDownAsync();
         Task<IEnumerable<Organization>> GetOrganizationsByAddressAsync(string address);
 
         // ===== Organization Statistics =====

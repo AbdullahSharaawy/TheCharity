@@ -1,6 +1,5 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Net.Mail;
 using TheCharityDAL.Enums;
 
 namespace TheCharityDAL.Entities
@@ -25,7 +24,7 @@ namespace TheCharityDAL.Entities
         public virtual ICollection<Attachment> RecipientAttachments { get; private set; } = new List<Attachment>();
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
-        public DateTime RegistrationDate { get; private set; } = DateTime.Now;
+        public DateTime RegistrationDate { get; private set; } = DateTime.UtcNow;
         public DateTime? UpdatedOn { get; private set; }
         public DonatedItem(string donorId, int organizationId, string? name, string? description, ItemCategory? itemCategory)
         {
@@ -40,7 +39,7 @@ namespace TheCharityDAL.Entities
             if (image != null)
             {
                 this.Images?.Add(image);
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void RemoveImage(ItemImage image)
@@ -48,7 +47,7 @@ namespace TheCharityDAL.Entities
             if (image != null)
             {
                 this.Images?.Remove(image);
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void AddItemAttachment(Attachment attachment)
@@ -56,7 +55,7 @@ namespace TheCharityDAL.Entities
             if (attachment != null)
             {
                 this.ItemAttachments?.Add(attachment);
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void RemoveItemAttachment(Attachment attachment)
@@ -71,7 +70,7 @@ namespace TheCharityDAL.Entities
             if (attachment != null)
             {
                 this.RecipientAttachments?.Add(attachment);
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void RemoveRecipientAttachment(Attachment attachment)
@@ -79,7 +78,7 @@ namespace TheCharityDAL.Entities
             if (attachment != null)
             {
                 this.RecipientAttachments?.Remove(attachment);
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditName(string? name)
@@ -87,7 +86,7 @@ namespace TheCharityDAL.Entities
             if (!name.IsNullOrEmpty())
             {
                 this.Name = name;
-                UpdatedOn = DateTime.Now;
+                UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditDescription(string? description)
@@ -95,7 +94,7 @@ namespace TheCharityDAL.Entities
             if (!description.IsNullOrEmpty())
             {
                 this.Description = description;
-                UpdatedOn = DateTime.Now;
+                UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditItemCategory(ItemCategory? category)
@@ -103,7 +102,7 @@ namespace TheCharityDAL.Entities
             if (category.HasValue)
             {
                 this.ItemCategory = category;
-                UpdatedOn = DateTime.Now;
+                UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditAvailability(bool? isAvailable)
@@ -111,31 +110,31 @@ namespace TheCharityDAL.Entities
             if (isAvailable.HasValue)
             {
                 this.IsAvailable = isAvailable;
-                UpdatedOn = DateTime.Now;
+                UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditOrganization(int organizationId)
         {
             this.OrganizationId = organizationId;
-            UpdatedOn = DateTime.Now;
+            UpdatedOn = DateTime.UtcNow;
         }
         public void EditDonor(string donorId)
         {
             if (!donorId.IsNullOrEmpty())
             {
                 this.DonorId = donorId;
-                UpdatedOn = DateTime.Now;
+                UpdatedOn = DateTime.UtcNow;
             }
         }
         public void Delete()
         {
             this.IsDeleted = true;
-            this.DeletedOn = DateTime.Now;
+            this.DeletedOn = DateTime.UtcNow;
         }
         public void Restore()
         {
             this.IsDeleted = false;
-            this.UpdatedOn = DateTime.Now;
+            this.UpdatedOn = DateTime.UtcNow;
         }
     }
 }

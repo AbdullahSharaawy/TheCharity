@@ -8,18 +8,18 @@ namespace TheCharityBLL.Services.Abstraction
     public interface IOrganizationService
     {
         //CRUD Operations
-        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetAll(bool includeDeleted = false);
-        Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetAllByAddress(string address);
+        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetAllOrganizations(bool includeDeleted = false);
+        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetAllOrganizationsByAddress(string address);
 
-        Task<ServiceResponce<OrganizationResponseDto>> GetById(int id);
-        Task<ServiceResponce<OrganizationResponseDto>> GetByIdWithDetails(int id);
-        Task<ServiceResponce<OrganizationResponseDto>> GetByName(string name);
+        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationById(int id);//for update
+        Task<ServiceResponse<OrganizationDetailsResponseDto>> GetOrganizationByIdWithDetails(int id);//for details
+        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name);
         
-        Task<ServiceResponce<int>> AddOrganization(CreateOrganizationDto createOrganizationDto);
-        Task<ServiceResponce<bool>> UpdateOrganization(int id,UpdateOrganizationDto updateOrganizationDto); 
+        Task<ServiceResponse<int>> AddOrganization(CreateOrganizationDto createOrganizationDto);
+        Task<ServiceResponse<bool>> UpdateOrganization(UpdateOrganizationDto updateOrganizationDto); 
         
-        Task<ServiceResponce<bool>> DeleteOrganization(int id);
-        Task<ServiceResponce<bool>> RestoreOrganization(int id);
+        Task<ServiceResponse<bool>> DeleteOrganization(int id);
+        Task<ServiceResponse<bool>> RestoreOrganization(int id);
 
         ////Validation
         //Task<ServiceResponce<bool>> OrganizationExists(int id);

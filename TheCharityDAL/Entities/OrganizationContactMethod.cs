@@ -11,7 +11,7 @@ namespace TheCharityDAL.Entities
         public ContactType? Type { get; private set; }
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
-        public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
+        public DateTime? RegistrationDate { get; private set; } = DateTime.UtcNow;
         public DateTime? UpdatedOn { get; private set; }
         public int? CompanyId { get; private set; }
 
@@ -26,23 +26,23 @@ namespace TheCharityDAL.Entities
             if (!value.IsNullOrEmpty())
             {
                 this.Value = value;
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditType(ContactType? type) {
             if (type.HasValue)
             {
                 this.Type = type;
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void Delete() {
             this.IsDeleted = true;
-            this.DeletedOn = DateTime.Now;
+            this.DeletedOn = DateTime.UtcNow;
         }
         public void Restore() { 
             this.IsDeleted = false;
-            this.UpdatedOn = DeletedOn;
+            this.UpdatedOn = DateTime.UtcNow; ;
         }
     }
 }
