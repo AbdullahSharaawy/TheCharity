@@ -11,6 +11,7 @@ namespace TheCharityDAL.Entities
         public string? Address { get; private set; }
         public int? PaymentId { get; private set; }
 
+
         [ForeignKey(nameof(PaymentId))]
         public PaymentInfo? PaymentInfo { get; private set; }
         public virtual ICollection<SoloCampaign> SoloCampaigns { get; set; } = new List<SoloCampaign>();
@@ -20,7 +21,7 @@ namespace TheCharityDAL.Entities
         public virtual ICollection<OrganizationContactMethod> ContactMethods { get; private set; } = new List<OrganizationContactMethod>();
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
-        public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
+        public DateTime? RegistrationDate { get; private set; } = DateTime.UtcNow;
         public DateTime? UpdatedOn { get; private set; }
         public Organization(string? name, string? address, int? paymentId)
         {
@@ -33,7 +34,7 @@ namespace TheCharityDAL.Entities
             if (!name.IsNullOrEmpty())
             {
                 this.Name = name;
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void EditAddress(string? address)
@@ -41,18 +42,18 @@ namespace TheCharityDAL.Entities
             if (!address.IsNullOrEmpty())
             {
                 this.Address = address;
-                this.UpdatedOn = DateTime.Now;
+                this.UpdatedOn = DateTime.UtcNow;
             }
         }
         public void Delete()
         {
             this.IsDeleted = true;
-            this.DeletedOn = DateTime.Now;
+            this.DeletedOn = DateTime.UtcNow;
         }
         public void Restore()
         {
             this.IsDeleted = false;
-            this.UpdatedOn = DateTime.Now;
+            this.UpdatedOn = DateTime.UtcNow;
         }
     }
 }

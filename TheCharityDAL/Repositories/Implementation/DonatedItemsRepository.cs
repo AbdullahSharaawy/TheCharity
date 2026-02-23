@@ -26,7 +26,7 @@ namespace TheCharityDAL.Repositories.Implementation
             return await query
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -87,7 +87,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -98,7 +98,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -109,7 +109,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -120,7 +120,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -131,7 +131,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -146,7 +146,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.Description != null && di.Description.Contains(searchTerm)))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -396,7 +396,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            di.RegistrationDate >= cutoffDate)
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .OrderByDescending(di => di.RegistrationDate)
                 .ToListAsync();
         }
@@ -525,7 +525,7 @@ namespace TheCharityDAL.Repositories.Implementation
         {
             return await _context.DonatedItems
                 .Where(di => di.Id == id && (di.IsDeleted == false))
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .FirstOrDefaultAsync();
         }
 
@@ -554,7 +554,7 @@ namespace TheCharityDAL.Repositories.Implementation
                 .Where(di => di.IsDeleted == false)
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .OrderByDescending(di => di.RegistrationDate)
                 .Take(limit)
                 .ToListAsync();
@@ -582,7 +582,7 @@ namespace TheCharityDAL.Repositories.Implementation
                 .Where(di => di.DonorId == donorId &&
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .OrderByDescending(di => di.RegistrationDate)
                 .ToListAsync();
         }
@@ -667,7 +667,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -716,7 +716,7 @@ namespace TheCharityDAL.Repositories.Implementation
             return await query
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -728,7 +728,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            (di.IsDeleted == false))
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .ToListAsync();
         }
 
@@ -741,7 +741,7 @@ namespace TheCharityDAL.Repositories.Implementation
                            di.RegistrationDate <= endDate)
                 .Include(di => di.Organization)
                 .Include(di => di.Donor)
-                .Include(di => di.Images.Where(img => img.IsDeleted == false))
+                .Include(di => di.Images.Where(img => img.IsDeleted == false && img.IsMain==true))
                 .OrderBy(di => di.RegistrationDate)
                 .ToListAsync();
         }
@@ -799,5 +799,7 @@ namespace TheCharityDAL.Repositories.Implementation
                 .Where(x => !string.IsNullOrEmpty(x.DonorId))
                 .ToDictionary(x => x.DonorId, x => x.ActivityCount);
         }
+
+     
     }
 }

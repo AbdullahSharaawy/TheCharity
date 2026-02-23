@@ -1,7 +1,7 @@
 ﻿
 namespace TheCharityBLL.DTOs
 {
-    public class ServiceResponce<T>
+    public class ServiceResponse<T>
     {
         public bool Success { get; set; }
         public string? Message { get; set; }

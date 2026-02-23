@@ -7,24 +7,24 @@ using TheCharityDAL.Repositories.Abstraction;
 
 namespace TheCharityBLL.Services.Repository
 {
-    public class OraganizationService : IOrganizationService
+    public class OrganizationService : IOrganizationService
     {
         private readonly IOrganizationRepository _repository;
         private readonly OrganizationMaper _mapper;
-        public OraganizationService(IOrganizationRepository repository)
+        public OrganizationService(IOrganizationRepository repository)
         {
             _repository = repository;
             _mapper = new OrganizationMaper();
         }
         //we must use global exception handling 
-        public async Task<ServiceResponce<int>> AddOrganization(CreateOrganizationDto createOrganizationDto)
+        public async Task<ServiceResponse<int>> AddOrganization(CreateOrganizationDto createOrganizationDto)
         {
             //validation
 
             //
             if (await _repository.OrganizationNameExistsAsync(createOrganizationDto.Name))
             {
-                return new ServiceResponce<int>
+                return new ServiceResponse<int>
                 {
                     Success = false,
                     Message = "Organization name already exists.",
@@ -33,7 +33,7 @@ namespace TheCharityBLL.Services.Repository
             var organization = _mapper.MapToOrganization(createOrganizationDto);
             var createorganization = await _repository.AddOrganizationAsync(organization);
             //organization.RegistrationDate = DateTime.UtcNow;
-            return new ServiceResponce<int>
+            return new ServiceResponse<int>
             {
                 Success = true,
                 Data = createorganization.Id,
@@ -41,21 +41,21 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<bool>> DeleteOrganization(int id)
+        public async Task<ServiceResponse<bool>> DeleteOrganization(int id)
         {
             //validation
 
             //
             if (!await _repository.OrganizationExistsAsync(id))
             {
-                return new ServiceResponce<bool>
+                return new ServiceResponse<bool>
                 {
                     Success = false,
                     Message = $"Organization with ID {id} not found.",
                 };
             }
-            var delete = _repository.DeleteOrganizationAsync(id);
-            return new ServiceResponce<bool>
+            await _repository.DeleteOrganizationAsync(id);
+            return new ServiceResponse<bool>
             {
                 Success = true,
                 Data = true,
@@ -63,11 +63,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetAll(bool includeDeleted = false)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetAllOrganizations(bool includeDeleted = false)
         {
             var organizations = await _repository.GetAllOrganizationsAsync(includeDeleted);
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -75,11 +75,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetAllByAddress(string address)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetAllOrganizationsByAddress(string address)
         {
             var organizations = await _repository.GetOrganizationsByAddressAsync(address);
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -87,19 +87,20 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<OrganizationResponseDto>> GetById(int id)
+        public async Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationById(int id)
         {
+            //payment info
             var organization = await _repository.GetOrganizationByIdAsync(id);
             if(organization == null)
             {
-                return new ServiceResponce<OrganizationResponseDto>
+                return new ServiceResponse<OrganizationResponseDto>
                 {
                     Success = false,
                     Message = $"Organization with ID {id} not found.",
                 };
             }
             var organizationDto = _mapper.MapToOrganizationResponseDto(organization);
-            return new ServiceResponce<OrganizationResponseDto>
+            return new ServiceResponse<OrganizationResponseDto>
             {
                 Success = true,
                 Data = organizationDto,
@@ -107,19 +108,19 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<OrganizationResponseDto>> GetByIdWithDetails(int id)
+        public async Task<ServiceResponse<OrganizationDetailsResponseDto>> GetOrganizationByIdWithDetails(int id)
         {
             var organization = await _repository.GetOrganizationWithDetailsAsync(id);
             if(organization == null)
             {
-                return new ServiceResponce<OrganizationResponseDto>
+                return new ServiceResponse<OrganizationDetailsResponseDto>
                 {
                     Success = false,
                     Message = $"Organization with ID {id} not found.",
                 };
             }
-            var organizationDto = _mapper.MapToOrganizationResponseDto(organization);
-            return new ServiceResponce<OrganizationResponseDto>
+            var organizationDto = _mapper.MapToOrganizationDetailsResponseDto(organization);
+            return new ServiceResponse<OrganizationDetailsResponseDto>
             {
                 Success = true,
                 Data = organizationDto,
@@ -127,19 +128,19 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<OrganizationResponseDto>> GetByName(string name)
+        public async Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name)
         {
             var organization = await _repository.GetOrganizationByNameAsync(name);
             if(organization == null)
             {
-                return new ServiceResponce<OrganizationResponseDto>
+                return new ServiceResponse<OrganizationResponseDto>
                 {
                     Success = false,
                     Message = $"Organization with name {name} not found.",
                 };
             }
             var organizationDto = _mapper.MapToOrganizationResponseDto(organization);
-            return new ServiceResponce<OrganizationResponseDto>
+            return new ServiceResponse<OrganizationResponseDto>
             {
                 Success = true,
                 Data = organizationDto,
@@ -147,45 +148,58 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<bool>> RestoreOrganization(int id)
+        public async Task<ServiceResponse<bool>> RestoreOrganization(int id)
         {
             //validation
 
             //
             if (!await _repository.OrganizationExistsAsync(id))
             {
-                return new ServiceResponce<bool>
+                return new ServiceResponse<bool>
                 {
                     Success = false,
                     Message = $"Organization with ID {id} not found.",
                 };
             }
-            var restore = _repository.RestoreOrganizationAsync(id);
-            return new ServiceResponce<bool>
+            await _repository.RestoreOrganizationAsync(id);
+            return new ServiceResponse<bool>
             {
                 Success = true,
                 Message = "Organization restored successfully"
             };
         }
 
-        public async Task<ServiceResponce<bool>> UpdateOrganization(int id, UpdateOrganizationDto updateOrganizationDto)
+        public async Task<ServiceResponse<bool>> UpdateOrganization( UpdateOrganizationDto updateOrganizationDto)
         {
             //validation
 
             //
-            var existingOrganization = await _repository.GetOrganizationByIdAsync(id);
+           
+            var existingOrganization = await _repository.GetOrganizationByIdAsync(updateOrganizationDto.Id);
             if (existingOrganization == null)
             {
-                return new ServiceResponce<bool>
+                return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Organization with ID {id} not found.",
+                    Message = $"Organization with ID {updateOrganizationDto.Id} not found.",
                 };
             }
+            if(existingOrganization.Name != updateOrganizationDto.Name)
+            {
+                if (await _repository.OrganizationNameExistsAsync(updateOrganizationDto.Name))
+                {
+                    return new ServiceResponse<bool>
+                    {
+                        Success = false,
+                        Message = "Organization name already exists.",
+                    };
+                }
+            }
+
             existingOrganization.EditName(updateOrganizationDto.Name);
             existingOrganization.EditAddress(updateOrganizationDto.Address);
             var updateOrganization = await _repository.UpdateOrganizationAsync(existingOrganization);
-            return new ServiceResponce<bool>
+            return new ServiceResponse<bool>
             {
                 Success = true,
                 Message = "Organization updated successfully."

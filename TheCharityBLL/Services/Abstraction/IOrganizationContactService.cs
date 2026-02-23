@@ -8,16 +8,16 @@ namespace TheCharityBLL.Services.Abstraction
 {
     public interface IOrganizationContactService
     {
-        Task<ServiceResponce<IEnumerable<OrganizationContactMethodResponseDto>>> GetAllContactMethodsByOrganizationId(int organizationId);
-        Task<ServiceResponce<OrganizationContactMethodResponseDto>> GetContactMethodById(int contactMethodId);
-        Task<ServiceResponce<IEnumerable<OrganizationContactMethodResponseDto>>> GetContactMethodsByType(int organizationId, ContactType type);
+        Task<ServiceResponse<IEnumerable<OrganizationContactMethodResponseDto>>> GetAllContactMethodsByOrganizationId(int organizationId);
+        Task<ServiceResponse<OrganizationContactMethodResponseDto>> GetContactMethodById(int contactMethodId);
+        Task<ServiceResponse<IEnumerable<OrganizationContactMethodResponseDto>>> GetContactMethodsByType(int organizationId, ContactType type);
 
-        Task<ServiceResponce<int>> AddContactMethod(CreateOrganizationContactMethodDto contactMethod);
-        Task<ServiceResponce<bool>> UpdateContactMethod(int id,UpdateOrganizationContactMethodDto contactMethod);
+        Task<ServiceResponse<int>> AddContactMethod(CreateOrganizationContactMethodDto contactMethod);
+        Task<ServiceResponse<bool>> UpdateContactMethod(UpdateOrganizationContactMethodDto contactMethod);
 
-        Task<ServiceResponce<bool>> DeleteContactMethod(int contactMethodId);
-        Task<ServiceResponce<bool>> RestoreContactMethod(int contactMethodId);
+        Task<ServiceResponse<bool>> DeleteContactMethod(int contactMethodId);
+        Task<ServiceResponse<bool>> RestoreContactMethod(int contactMethodId);
 
-        Task<ServiceResponce<int>> GetContactMethodCountByType(int organizationId, ContactType type);
+        Task<ServiceResponse<int>> GetContactMethodCountByType(int organizationId, ContactType type);
     }
 }

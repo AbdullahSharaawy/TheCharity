@@ -11,7 +11,7 @@ namespace TheCharityBLL.DTOs.OrganizationContactMethodDTOs
     public class UpdateOrganizationContactMethodDto
     {
 
-
+        public int Id { get; set; }
         [MaxLength(200, ErrorMessage = "Value cannot exceed 200 characters.")]
         public string? Value { get; set; }
 

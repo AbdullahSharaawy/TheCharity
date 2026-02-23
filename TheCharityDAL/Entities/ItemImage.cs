@@ -11,6 +11,9 @@ namespace TheCharityDAL.Entities
 
         [ForeignKey(nameof(DonatedItemId))]
         public DonatedItem? DonatedItem { get; private set; }
+        // 
+        public bool IsMain { get; set; } = false;
+        //
         public bool IsDeleted { get; private set; } = false;
         public DateTime? DeletedOn { get; private set; }
         public DateTime? RegistrationDate { get; private set; } = DateTime.Now;

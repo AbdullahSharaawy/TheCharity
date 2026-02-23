@@ -17,10 +17,10 @@ namespace TheCharityBLL.Services.Repository
             _repository = repository;
             _mapper = new OrganizationMaper();
         }
-        public async Task<ServiceResponce<int>> GetActiveOrganizationsCount()
+        public async Task<ServiceResponse<int>> GetActiveOrganizationsCount()
         {
             var activeCount = await _repository.GetActiveOrganizationsCountAsync();
-            return new ServiceResponce<int>
+            return new ServiceResponse<int>
             {
                 Success = true,
                 Data = activeCount,
@@ -28,11 +28,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetByCampaignCount(int minCampaigns)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetByCampaignCount(int minCampaigns)
         {
             var organizations = await _repository.GetOrganizationsByCampaignCountAsync(minCampaigns);
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -40,11 +40,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetByContactType(ContactType type)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetByContactType(ContactType type)
         {
             var organizations = await _repository.GetOrganizationsByContactTypeAsync(type);
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -52,11 +52,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetDeletedOrganizations()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetDeletedOrganizations()
         {
             var deletedOrganizations = await _repository.GetDeletedOrganizationsAsync();
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(deletedOrganizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -64,11 +64,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetRecentlyRegisteredOrganizations(int days)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetRecentlyRegisteredOrganizations(int days)
         {
             var organizations = await _repository.GetRecentlyRegisteredOrganizationsAsync(days);
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -76,10 +76,22 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<int>> GetTotalOrganizationsCount()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDropDownListDto>>> GetOrganizationsDropDownList()
+        {
+            var organizations = await _repository.GetOrganizationsDropDownAsync();
+            var organizationDtos = _mapper.MapToOrganizationResponseDropDownListDtos(organizations);
+            return new ServiceResponse<IEnumerable<OrganizationResponseDropDownListDto>>
+            {
+                Success = true,
+                Data = organizationDtos,
+                Message = "Organizations for dropdown list retrieved successfully."
+            };
+        }
+
+        public async Task<ServiceResponse<int>> GetTotalOrganizationsCount()
         {
             var totalCount = await _repository.GetTotalOrganizationsCountAsync();
-            return new ServiceResponce<int>
+            return new ServiceResponse<int>
             {
                 Success = true,
                 Data = totalCount,
@@ -88,11 +100,11 @@ namespace TheCharityBLL.Services.Repository
 
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithActiveCampaigns()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetWithActiveCampaigns()
         {
             var organizations = await _repository.GetOrganizationsWithActiveCampaignsAsync();
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -100,11 +112,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithCompletedCampaigns()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetWithCompletedCampaigns()
         {
             var organizations = await _repository.GetOrganizationsWithCompletedCampaignsAsync();
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -112,11 +124,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithoutCampaigns()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetWithoutCampaigns()
         {
             var organizations = await _repository.GetOrganizationsWithoutCampaignsAsync();
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -124,11 +136,11 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> GetWithoutPaymentInfo()
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetWithoutPaymentInfo()
         {
             var organizations = await _repository.GetOrganizationsWithoutPaymentInfoAsync();
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
@@ -136,11 +148,19 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponce<IEnumerable<OrganizationResponseDto>>> SearchOrganizations(string searchTerm)
+        public async Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> SearchOrganizations(string searchTerm)
         {
             var organizations = await _repository.SearchOrganizationsAsync(searchTerm);
+            if (organizations == null || !organizations.Any())
+            {
+                return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
+                {
+                    Success = true,
+                    Message = $"No organizations found matching search term '{searchTerm}'."
+                };
+            }
             var organizationDtos = _mapper.MapToOrganizationResponseDtos(organizations);
-            return new ServiceResponce<IEnumerable<OrganizationResponseDto>>
+            return new ServiceResponse<IEnumerable<OrganizationResponseDto>>
             {
                 Success = true,
                 Data = organizationDtos,
