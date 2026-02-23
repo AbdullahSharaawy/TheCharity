@@ -14,7 +14,6 @@ using TheCharityDAL.Repositories.Implementation;
 using TheCharityBLL.Services.Repository;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Settings;
-
 namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions
@@ -87,7 +86,7 @@ namespace TheCharityBLL.Helpers
             // Services Injection
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
-
+            services.AddScoped<IPaymobService,PaymobService>();
             // mapper Injection
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
