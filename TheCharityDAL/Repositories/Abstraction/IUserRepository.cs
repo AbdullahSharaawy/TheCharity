@@ -10,7 +10,7 @@ namespace TheCharityDAL.Repositories.Abstraction
         Task<IdentityResult> UpdateUserAsync(User user);
         Task<IdentityResult> DeleteUserAsync(User user);
         Task<IdentityResult> RestoreUserAsync(string id);
-
+        public  Task AddLoginAsync(User user, UserLoginInfo loginInfo);
         // Lookup
         Task<User?> GetUserByIdAsync(string id);
         Task<User?> GetUserByEmailAsync(string email);
@@ -18,6 +18,7 @@ namespace TheCharityDAL.Repositories.Abstraction
         Task<IEnumerable<User>?> GetAllUsersAsync();
         Task<bool> UserExistsAsync(string userId);
         Task<bool> IsUserDeletedAsync(string userId);
+        public Task<IList<UserLoginInfo>> GetLoginsAsync(User user);
 
         // Password
         Task<bool> CheckPasswordAsync(User user, string password);

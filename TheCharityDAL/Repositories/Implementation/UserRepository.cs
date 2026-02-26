@@ -190,7 +190,11 @@ namespace TheCharityDAL.Repositories.Implementation
         ////////////new addations
         public async Task AccessFailedAsync(User user)
            => await _userManager.AccessFailedAsync(user);
-
+        public async Task<IList<UserLoginInfo>> GetLoginsAsync(User user)
+        {
+            return await _userManager.GetLoginsAsync(user);
+        }
+        public async Task AddLoginAsync(User user,UserLoginInfo loginInfo) => await _userManager.AddLoginAsync(user,loginInfo);
         public async Task ResetAccessFailedCountAsync(User user)
             => await _userManager.ResetAccessFailedCountAsync(user);
 

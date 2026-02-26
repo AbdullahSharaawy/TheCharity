@@ -54,10 +54,18 @@ namespace TheCharityBLL.Services.Repository
             // 3. Reset lockout on success
             await _userRepository.ResetAccessFailedCountAsync(user);
 
-            // 4. Load roles
-            var roles = await _userRepository.GetUserRolesAsync(user.Id);
+          
+            return await GenerateJwtTokenAsync(user);
+        }
+        public async Task<string> GenerateJwtTokenAsync(CreateUserDTO createUserDTO)
+        {
+            var user = _mapper.Map<User>(createUserDTO);
+            return await GenerateJwtTokenAsync(user);
+        }
 
-            // 5. Build claims
+
+        private async Task<string> GenerateJwtTokenAsync(User user)
+        {
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id),
@@ -66,10 +74,12 @@ namespace TheCharityBLL.Services.Repository
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
 
+            
+            var roles = await _userRepository.GetUserRolesAsync(user.Id);
+
             foreach (var role in roles)
                 claims.Add(new Claim(ClaimTypes.Role, role));
 
-            // 6. Sign and return the JWT
             var key = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(_configuration["JWT:Key"]!));
 
@@ -180,7 +190,18 @@ namespace TheCharityBLL.Services.Repository
                 throw;
             }
         }
-
+        public async Task<bool> IsExternalLoginLinkedAsync(string providerKey,string loginProvider,UserResponseDTO userDto)
+        {
+            var user = _mapper.Map<User>(userDto);
+            var userLogins = await _userRepository.GetLoginsAsync(user);
+            var existingLogin = userLogins.FirstOrDefault(l =>
+                l.LoginProvider == loginProvider && l.ProviderKey == providerKey);
+            if (existingLogin == null)
+            {
+               return false;
+            }
+            return true;
+        }
         public async Task<UserResponseDTO?> GetUserByEmailAsync(string email)
         {
             if (string.IsNullOrWhiteSpace(email))
@@ -410,6 +431,13 @@ namespace TheCharityBLL.Services.Repository
             if (string.IsNullOrWhiteSpace(userId))
                 throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
             return _userRepository.GetUserMaxStorageAsync(userId);
+        }
+
+        public async Task AddLoginAsync(CreateUserDTO createUserDTO, UserLoginInfo loginInfo)
+        {
+            var user = _mapper.Map<User>(createUserDTO);
+
+            await _userRepository.AddLoginAsync(user, loginInfo);
         }
     }
 }

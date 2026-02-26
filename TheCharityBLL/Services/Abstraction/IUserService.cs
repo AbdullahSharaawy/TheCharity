@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheCharityBLL.DTOs.UserDTOs;
+using TheCharityDAL.Entities;
 
 namespace TheCharityBLL.Services.Abstraction
 {
@@ -17,13 +18,14 @@ namespace TheCharityBLL.Services.Abstraction
         Task<bool> UserExistsAsync(string userId);
         Task<bool> IsUserDeletedAsync(string userId);
         Task<string?> LoginAsync(string usernameOrEmail, string password);
-
+        public  Task<bool> IsExternalLoginLinkedAsync(string providerKey, string loginProvider, UserResponseDTO userDto);
+        public Task<string> GenerateJwtTokenAsync(CreateUserDTO createUserDTO);
         // CRUD
         Task<IdentityResult> CreateUserAsync(CreateUserDTO createUserDTO);
         Task<IdentityResult> UpdateUserAsync(UpdateUserDTO updateUserDTO);
         Task<IdentityResult> DeleteUserAsync(string userId);
         Task<IdentityResult> RestoreUserAsync(string id);
-
+        public Task AddLoginAsync(CreateUserDTO createUserDTO , UserLoginInfo loginInfo);
         // Password
         Task<bool> ValidatePasswordAsync(string userId, string password);
         Task<bool> CheckPasswordAsync(string userId, string password);
