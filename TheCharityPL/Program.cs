@@ -1,5 +1,10 @@
 using Microsoft.Extensions.DependencyInjection;
 using TheCharityBLL.Helpers;
+using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Repository;
+using TheCharityDAL.Repositories.Abstraction;
+using TheCharityDAL.Repositories.Implementation;
+using TheCharityPL.Middlewares;
 
 namespace TheCharityPL
 {
@@ -23,7 +28,19 @@ namespace TheCharityPL
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-            
+
+            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
+            builder.Services.AddScoped<IDonatedItemsRepository, DonatedItemsRepository>();
+
+            builder.Services.AddScoped<IOrganizationService, OrganizationService>();
+            builder.Services.AddScoped<IOrganizationQueryService,OrganizationQueryService>();
+            builder.Services.AddScoped<IOrganizationContactService, OrganizationContactService>();
+            builder.Services.AddScoped<IDonatedItemService, DonatedItemService>();
+            builder.Services.AddScoped<IDonatedItemQueryService, DonatedItemQueryService>();
+            builder.Services.AddScoped<IDonatedItemAnalyticsService, DonatedItemAnalyticsService>();
+            builder.Services.AddScoped<IDonatedItemAttachmentService, DonatedItemAttachmentService>();   
+            builder.Services.AddScoped<IDonatedItemImageService, DonatedItemImageService>();
+
             var app = builder.Build();
 
             app.MapHealthChecks("/health");
@@ -34,6 +51,9 @@ namespace TheCharityPL
                 app.UseSwagger();
                 app.UseSwaggerUI();
             }
+
+            //global exception handling middleware
+            app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
 

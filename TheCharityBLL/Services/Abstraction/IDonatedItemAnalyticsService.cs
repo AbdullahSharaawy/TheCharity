@@ -6,6 +6,7 @@ namespace TheCharityBLL.Services.Abstraction
 {
     public interface IDonatedItemAnalyticsService
     {
+        //use in dashboard
         Task<ServiceResponse<int>> GetTotalDonatedItemsCount();
         Task<ServiceResponse<int>> GetAvailableDonatedItemsCount();
         Task<ServiceResponse<int>> GetDonatedItemsCountByOrganization(int organizationId);
