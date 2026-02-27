@@ -18,7 +18,7 @@ namespace TheCharityPL
             builder.Services.TheCharityDependencyInjection();
             builder.Services.TheCharityIdentity(builder.Configuration);
             builder.Services.FoxArtEmailConfiguration(builder.Configuration);
-
+            builder.Services.ThirdPartyAuthentication(builder.Configuration);
             // Add services to the container.
             builder.Services.AddControllers().AddJsonOptions(options =>
             {
@@ -28,18 +28,6 @@ namespace TheCharityPL
             // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            builder.Services.AddScoped<IOrganizationRepository, OrganizationRepository>();
-            builder.Services.AddScoped<IDonatedItemsRepository, DonatedItemsRepository>();
-
-            builder.Services.AddScoped<IOrganizationService, OrganizationService>();
-            builder.Services.AddScoped<IOrganizationQueryService,OrganizationQueryService>();
-            builder.Services.AddScoped<IOrganizationContactService, OrganizationContactService>();
-            builder.Services.AddScoped<IDonatedItemService, DonatedItemService>();
-            builder.Services.AddScoped<IDonatedItemQueryService, DonatedItemQueryService>();
-            builder.Services.AddScoped<IDonatedItemAnalyticsService, DonatedItemAnalyticsService>();
-            builder.Services.AddScoped<IDonatedItemAttachmentService, DonatedItemAttachmentService>();   
-            builder.Services.AddScoped<IDonatedItemImageService, DonatedItemImageService>();
 
             var app = builder.Build();
 
@@ -56,7 +44,8 @@ namespace TheCharityPL
             app.UseMiddleware<ExceptionMiddleware>();
 
             app.UseHttpsRedirection();
-
+            app.UseRouting();
+            app.UseAuthentication();
             app.UseAuthorization();
 
 

@@ -57,9 +57,9 @@ namespace TheCharityBLL.Services.Repository
           
             return await GenerateJwtTokenAsync(user);
         }
-        public async Task<string> GenerateJwtTokenAsync(CreateUserDTO createUserDTO)
+        public async Task<string> GenerateJwtTokenAsync(UserResponseDTO UserDTO)
         {
-            var user = _mapper.Map<User>(createUserDTO);
+            var user = _mapper.Map<User>(UserDTO);
             return await GenerateJwtTokenAsync(user);
         }
 
@@ -217,6 +217,10 @@ namespace TheCharityBLL.Services.Repository
                 _logger.LogError(ex, "Error getting user with email: {Email}", email);
                 throw;
             }
+        }
+        public async Task<IdentityResult> CreateExternalUserAsync(string email)
+        {
+            return await _userRepository.CreateExternalUserAsync(email);
         }
         public async Task<IdentityResult> CreateUserAsync(CreateUserDTO createUserDTO)
         {
@@ -433,9 +437,9 @@ namespace TheCharityBLL.Services.Repository
             return _userRepository.GetUserMaxStorageAsync(userId);
         }
 
-        public async Task AddLoginAsync(CreateUserDTO createUserDTO, UserLoginInfo loginInfo)
+        public async Task AddLoginAsync(UserResponseDTO UserDTO, UserLoginInfo loginInfo)
         {
-            var user = _mapper.Map<User>(createUserDTO);
+            var user = _mapper.Map<User>(UserDTO);
 
             await _userRepository.AddLoginAsync(user, loginInfo);
         }

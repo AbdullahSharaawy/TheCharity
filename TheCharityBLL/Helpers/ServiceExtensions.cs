@@ -14,6 +14,7 @@ using TheCharityDAL.Repositories.Implementation;
 using TheCharityBLL.Services.Repository;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Settings;
+using Microsoft.AspNetCore.Authentication.Cookies;
 namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions
@@ -33,25 +34,7 @@ namespace TheCharityBLL.Helpers
             .AddEntityFrameworkStores<TheCharityDbContext>()
             .AddDefaultTokenProviders();
 
-           services.AddAuthentication(options =>
-            {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-           .AddJwtBearer(options =>
-           {
-           options.TokenValidationParameters = new TokenValidationParameters
-           {
-                ValidateIssuer = true,
-                ValidateAudience = true,
-                ValidateLifetime = true,
-                ValidateIssuerSigningKey = true,
-                ValidIssuer = Configuration["Jwt:Issuer"],
-                ValidAudience = Configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"]))
-           };
-           }
-           );
+          
            
         }
         public static void FoxArtEmailConfiguration(this IServiceCollection services, IConfiguration configuration)
@@ -87,25 +70,52 @@ namespace TheCharityBLL.Helpers
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IEmailService, EmailService>();
             services.AddScoped<IPaymobService,PaymobService>();
+            services.AddScoped<IOrganizationService, OrganizationService>();
+            services.AddScoped<IOrganizationQueryService, OrganizationQueryService>();
+            services.AddScoped<IOrganizationContactService, OrganizationContactService>();
+            services.AddScoped<IDonatedItemService, DonatedItemService>();
+            services.AddScoped<IDonatedItemQueryService, DonatedItemQueryService>();
+            services.AddScoped<IDonatedItemAnalyticsService, DonatedItemAnalyticsService>();
+            services.AddScoped<IDonatedItemAttachmentService, DonatedItemAttachmentService>();
+            services.AddScoped<IDonatedItemImageService, DonatedItemImageService>();
             // mapper Injection
             services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
 
         }
-        public static void ThirdPartyAuthentication(this IServiceCollection services)
+        public static void ThirdPartyAuthentication(this IServiceCollection services, IConfiguration Configuration)
         {
-            services.AddAuthentication()
-                .AddGoogle(options =>
-                {
-                    // Configure Google authentication options here
-                    options.ClientId = "";
-                    options.ClientSecret = "";
-                })
-                .AddFacebook(options =>
-                {
-                    // Configure FaceBook authentication options here
-                    options.AppId = "";
-                    options.AppSecret = "";
-                });
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+ .AddJwtBearer(options =>
+ {
+     options.TokenValidationParameters = new TokenValidationParameters
+     {
+         ValidateIssuer = true,
+         ValidateAudience = true,
+         ValidateLifetime = true,
+         ValidateIssuerSigningKey = true,
+         ValidIssuer = Configuration["Jwt:Issuer"],
+         ValidAudience = Configuration["Jwt:Audience"],
+         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(
+             Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured")))
+     };
+ })
+ .AddCookie("ExternalCookie") // dedicated scheme for OAuth handshake only
+ .AddGoogle(options =>
+ {
+     options.SignInScheme = "ExternalCookie"; // scoped here only
+     options.ClientId = Configuration["Authentication:Google:ClientID"];
+     options.ClientSecret = Configuration["Authentication:Google:SecretKey"];
+ })
+ .AddFacebook(options =>
+ {
+     options.SignInScheme = "ExternalCookie"; // scoped here only
+     options.AppId = Configuration["Authentication:Facebook:ClientID"];
+     options.AppSecret = Configuration["Authentication:Facebook:SecretKey"];
+ });
         }
     }
 }

@@ -19,7 +19,17 @@ namespace TheCharityDAL.Repositories.Implementation
             _roleManager = roleManager ?? throw new ArgumentNullException(nameof(roleManager));
         }
 
+        public async Task<IdentityResult> CreateExternalUserAsync(string email)
+        {
+            var user = new User
+            {
+                Email = email,
+                UserName = email,
+                EmailConfirmed = true // Google/Facebook already verified it
+            };
 
+            return await _userManager.CreateAsync(user); // ✅ no password
+        }
         public async Task<IdentityResult> AddToRoleAsync(string userId, string role)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -194,7 +204,17 @@ namespace TheCharityDAL.Repositories.Implementation
         {
             return await _userManager.GetLoginsAsync(user);
         }
-        public async Task AddLoginAsync(User user,UserLoginInfo loginInfo) => await _userManager.AddLoginAsync(user,loginInfo);
+        public async Task AddLoginAsync(User user, UserLoginInfo loginInfo)
+        {
+            // Re-fetch as TRACKED instance fresh from UserManager
+            // to avoid conflict with any previously tracked instance
+            var trackedUser = await _userManager.FindByIdAsync(user.Id);
+
+            if (trackedUser == null)
+                throw new Exception("User not found");
+
+            await _userManager.AddLoginAsync(trackedUser, loginInfo);
+        }
         public async Task ResetAccessFailedCountAsync(User user)
             => await _userManager.ResetAccessFailedCountAsync(user);
 
