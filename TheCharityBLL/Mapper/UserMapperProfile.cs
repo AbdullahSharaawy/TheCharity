@@ -12,9 +12,9 @@ using AutoMapper;
 
 namespace TheCharityBLL.Mapper
 {
-    public class AutoMapperProfile : Profile
+    public class UserMapperProfile : Profile
     {
-        public AutoMapperProfile()
+        public UserMapperProfile()
         {
            
 

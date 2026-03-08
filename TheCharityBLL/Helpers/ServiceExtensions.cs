@@ -78,8 +78,10 @@ namespace TheCharityBLL.Helpers
             services.AddScoped<IDonatedItemAnalyticsService, DonatedItemAnalyticsService>();
             services.AddScoped<IDonatedItemAttachmentService, DonatedItemAttachmentService>();
             services.AddScoped<IDonatedItemImageService, DonatedItemImageService>();
+            services.AddScoped<IPaymentInfoService, PaymentInfoService>();
             // mapper Injection
-            services.AddAutoMapper(typeof(AutoMapperProfile).Assembly);
+            services.AddAutoMapper(typeof(UserMapperProfile).Assembly);
+            services.AddAutoMapper(typeof(PaymentInfoMappingProfile).Assembly);
 
         }
         public static void ThirdPartyAuthentication(this IServiceCollection services, IConfiguration Configuration)
