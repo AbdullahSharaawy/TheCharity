@@ -430,12 +430,7 @@ namespace TheCharityBLL.Services.Repository
         {
             return _userRepository.ConfirmEmailAsync(email, token);
         }
-        public Task<long> GetUserMaxStorageAsync(string userId)
-        {
-            if (string.IsNullOrWhiteSpace(userId))
-                throw new ArgumentException("User ID cannot be null or empty", nameof(userId));
-            return _userRepository.GetUserMaxStorageAsync(userId);
-        }
+       
 
         public async Task AddLoginAsync(UserResponseDTO UserDTO, UserLoginInfo loginInfo)
         {
