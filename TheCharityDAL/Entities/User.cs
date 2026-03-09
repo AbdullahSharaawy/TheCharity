@@ -14,12 +14,15 @@ namespace TheCharityDAL.Entities
         public string? Address { get; private set; }
        
         public User() { }
-        public User(string? userName,string? FullName, string? email, string? imgPath)
+        public User(string? userName,string? FullName, string? email, string? imgPath,string? Phone,string? Address )
         {
             this.UserName = userName;
             this.Email = email;
             this.ImgPath = imgPath;
             this.FullName = FullName;
+            this.PhoneNumber = Phone;
+            this.Address = Address;
+           
         }
         public void EditUsername(string? userName)
         {
