@@ -1,9 +1,8 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
 using TheCharityDAL.Entities;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.Organization
 {
     public interface IOrganizationService
     {
@@ -14,10 +13,10 @@ namespace TheCharityBLL.Services.Abstraction
         Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationById(int id);//for update
         Task<ServiceResponse<OrganizationDetailsResponseDto>> GetOrganizationByIdWithDetails(int id);//for details
         Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name);
-        
+
         Task<ServiceResponse<int>> AddOrganization(CreateOrganizationDto createOrganizationDto);
-        Task<ServiceResponse<bool>> UpdateOrganization(UpdateOrganizationDto updateOrganizationDto); 
-        
+        Task<ServiceResponse<bool>> UpdateOrganization(UpdateOrganizationDto updateOrganizationDto);
+
         Task<ServiceResponse<bool>> DeleteOrganization(int id);
         Task<ServiceResponse<bool>> RestoreOrganization(int id);
 

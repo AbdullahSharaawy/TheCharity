@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationContactMethodDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Organization;
 using TheCharityDAL.Enums;
 
 namespace TheCharityPL.Controllers

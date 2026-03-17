@@ -1,9 +1,8 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.ItemImageDTOs;
 using TheCharityDAL.Entities;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.DonatedItems
 {
     public interface IDonatedItemImageService
     {

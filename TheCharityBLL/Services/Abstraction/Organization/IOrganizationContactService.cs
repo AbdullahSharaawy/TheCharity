@@ -1,10 +1,8 @@
-﻿
-
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationContactMethodDTOs;
 using TheCharityDAL.Enums;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.Organization
 {
     public interface IOrganizationContactService
     {

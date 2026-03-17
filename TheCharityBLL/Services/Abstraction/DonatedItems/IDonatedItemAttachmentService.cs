@@ -1,8 +1,7 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.AttachmentDTOs;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.DonatedItems
 {
     public interface IDonatedItemAttachmentService
     {

@@ -15,6 +15,10 @@ using TheCharityBLL.Services.Repository;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using TheCharityBLL.Services.Abstraction.DonatedItems;
+using TheCharityBLL.Services.Abstraction.Organization;
+using TheCharityBLL.Services.Abstraction.Payment;
+using TheCharityBLL.Services.Abstraction.MoneyDonation;
 namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions
@@ -79,9 +83,13 @@ namespace TheCharityBLL.Helpers
             services.AddScoped<IDonatedItemAttachmentService, DonatedItemAttachmentService>();
             services.AddScoped<IDonatedItemImageService, DonatedItemImageService>();
             services.AddScoped<IPaymentInfoService, PaymentInfoService>();
+            services.AddScoped<IDonationService, DonationService>();
             // mapper Injection
-            services.AddAutoMapper(typeof(UserMapperProfile).Assembly);
-            services.AddAutoMapper(typeof(PaymentInfoMappingProfile).Assembly);
+            services.AddAutoMapper(cfg => {
+                cfg.AddProfile<UserMapperProfile>();
+                cfg.AddProfile<PaymentInfoMappingProfile>();
+            });
+            services.AddScoped<DonationMapper>();
 
         }
         public static void ThirdPartyAuthentication(this IServiceCollection services, IConfiguration Configuration)

@@ -2,7 +2,7 @@
 using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
 using TheCharityBLL.Mapper;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Organization;
 using TheCharityDAL.Repositories.Abstraction;
 
 namespace TheCharityBLL.Services.Repository

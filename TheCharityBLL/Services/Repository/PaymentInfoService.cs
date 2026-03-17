@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using TheCharityBLL.DTOs.PaymentInfoDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Payment;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
 

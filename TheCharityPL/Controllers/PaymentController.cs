@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.Security.Cryptography;
 using System.Text;
 using TheCharityBLL.DTOs.PaymentDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Payment;
 using TheCharityBLL.Services.Repository;
 
 namespace TheCharityPL.Controllers

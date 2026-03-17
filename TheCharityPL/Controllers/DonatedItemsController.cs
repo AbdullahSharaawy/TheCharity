@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityDAL.Enums;
 using TheCharityPL.Enums;
 

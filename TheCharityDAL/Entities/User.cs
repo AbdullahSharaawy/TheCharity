@@ -12,7 +12,7 @@ namespace TheCharityDAL.Entities
         public DateTime? RegistrationDate { get; private set; } = DateTime.Now;
         public DateTime? UpdatedOn { get; private set; }
         public string? Address { get; private set; }
-       
+      
         public User() { }
         public User(string? userName,string? FullName, string? email, string? imgPath,string? Phone,string? Address )
         {

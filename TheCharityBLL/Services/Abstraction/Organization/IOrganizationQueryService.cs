@@ -1,10 +1,9 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.Organization
 {
     public interface IOrganizationQueryService
     {

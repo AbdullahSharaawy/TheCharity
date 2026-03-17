@@ -3,7 +3,7 @@ using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityBLL.Helpers;
 using TheCharityBLL.Mapper;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 using TheCharityDAL.Repositories.Abstraction;

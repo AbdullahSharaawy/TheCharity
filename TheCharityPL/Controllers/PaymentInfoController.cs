@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using TheCharityBLL.DTOs.PaymentInfoDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Payment;
 
 namespace TheCharityPL.Controllers
 {

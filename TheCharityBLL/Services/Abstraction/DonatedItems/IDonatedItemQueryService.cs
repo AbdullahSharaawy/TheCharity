@@ -3,7 +3,7 @@ using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.DonatedItems
 {
     public interface IDonatedItemQueryService
     {

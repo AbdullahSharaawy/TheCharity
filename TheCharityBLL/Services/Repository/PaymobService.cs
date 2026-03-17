@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.Payment;
 
 namespace TheCharityBLL.Services.Repository
 {

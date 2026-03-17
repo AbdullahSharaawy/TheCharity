@@ -1,13 +1,12 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityDAL.Enums;
 
-namespace TheCharityBLL.Services.Abstraction
+namespace TheCharityBLL.Services.Abstraction.DonatedItems
 {
     public interface IDonatedItemService
     {
-        Task<ServiceResponse<IEnumerable<DonatedItemResponseDto>>> GetAllDonatedItems(bool includeDeleted );
+        Task<ServiceResponse<IEnumerable<DonatedItemResponseDto>>> GetAllDonatedItems(bool includeDeleted);
         Task<ServiceResponse<DonatedItemResponseDto>> GetDonatedItemById(int id);
         Task<ServiceResponse<DonatedItemDetailsResponseDto>> GetDonatedItemByIdWithDetails(int id);
 
@@ -28,8 +27,8 @@ namespace TheCharityBLL.Services.Abstraction
 
         Task<ServiceResponse<int>> BulkUpdateItemCategories(ItemCategory oldCategory, ItemCategory newCategory);
         Task<ServiceResponse<int>> BulkMarkItemsAsUnavailable(int organizationId);
-        Task<ServiceResponse<int>> DeleteOldDonatedItems(int daysOld );
-  
+        Task<ServiceResponse<int>> DeleteOldDonatedItems(int daysOld);
+
 
     }
 }

@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.ItemImageDTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
-using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityBLL.Services.Repository;
 
 namespace TheCharityPL.Controllers
