@@ -1,0 +1,12 @@
+/* main-page.css — global resets & page shell */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background: var(--off-white);
+  color: var(--charcoal);
+  font-family: var(--font-body);
+}

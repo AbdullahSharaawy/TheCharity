@@ -1,0 +1,20 @@
+:host {
+    /* Colors used for the whole website*/
+    --pr-color:#FFD400;
+    --pr-light-color:#FFC300;
+    --sc-color:#FF8C00;
+    --sc-light-color:#FF5F00;
+    --charcoal:#1e1e1e;
+    --background-color:#fdf4e8;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body: 'Lato', 'Trebuchet MS', sans-serif;
+
+
+    /* navbar */
+    --nb-height: 72px;
+    --nb-h-sm: 60px;
+    --nb-border: #2e2e2e;
+    --nb-muted: #7a6a5a;
+    --nb-sub: #8a7a6a;
+    --nb-surface: #262626;
+}
