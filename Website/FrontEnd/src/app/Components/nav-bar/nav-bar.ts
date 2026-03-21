@@ -5,9 +5,11 @@ import {
   computed,
   OnInit,
   OnDestroy,
+  Inject,
+  PLATFORM_ID,
 } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { RouterModule, RouterLinkActive, RouterLink } from '@angular/router';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { RouterModule } from '@angular/router';
 
 export interface NavLink {
   label: string;
@@ -23,20 +25,24 @@ export interface NavLink {
   styleUrls: ['./nav-bar.css'],
 })
 export class NavBar implements OnInit, OnDestroy {
-  /* - Navigation data - */
+
+  constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   links: NavLink[] = [
     { label: 'Journal', href: '/journal' },
     { label: 'About', href: '/about' },
   ];
 
   activeDropdown = signal<string | null>(null);
-  
+
   ngOnInit(): void {}
+
   ngOnDestroy(): void {
-    document.body.style.overflow = '';
+    if (isPlatformBrowser(this.platformId)) {
+      document.body.style.overflow = '';
+    }
   }
 
-  /* Desktop dropdown */
-  openDropdown(label: string): void  { this.activeDropdown.set(label); }
-  closeDropdown(): void              { this.activeDropdown.set(null); }
+  openDropdown(label: string): void { this.activeDropdown.set(label); }
+  closeDropdown(): void             { this.activeDropdown.set(null); }
 }

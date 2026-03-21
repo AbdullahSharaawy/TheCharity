@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { HeroSlider } from '../hero-slider/hero-slider';
-import { Welcome } from '../welcome/welcome';
+import { HeroSlider } from '../../Components/hero-slider/hero-slider';
+import { Welcome } from '../../Components/welcome/welcome';
 
 @Component({
   selector: 'app-main-page',
