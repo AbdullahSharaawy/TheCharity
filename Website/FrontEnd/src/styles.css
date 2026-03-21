@@ -1,11 +1,61 @@
-/* You can add global styles to this file, and also import other style files */
-
-.container {
-    width: 100px; /* Sets the width of the box */
-    height: 100px; /* Sets the height of the box */
-    background-color: #f0f0f0; /* Adds a background color */
-    border: 1px solid black; /* Adds a border */
-    padding: 10px; /* Adds space between content and border */
-    margin: 10px; /* Adds space outside the border, between other elements */
+/* Resets */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
+body {
+  background: var(--background-color);
+  color: var(--charcoal);
+  font-family: var(--font-body);
+}
+
+/* CTA Buttons */
+.cta {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 0.9rem 2.1rem;
+  border-radius: 50px;
+  text-decoration: none;
+  transition: all 0.22s ease;
+  cursor: pointer;
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.cta--primary {
+  background: var(--pr-color);
+  color: var(--charcoal);
+  box-shadow: 0 4px 18px rgba(196, 98, 45, .32);
+}
+
+.cta--primary:hover {
+  background: var(--sc-color);
+  color: #fff;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 26px rgba(196, 98, 45, .4);
+}
+
+.cta--secondary {
+  background: transparent;
+  color: var(--charcoal);
+  border: 2px solid var(--border-color);
+}
+
+.cta--secondary:hover {
+  border-color: var(--sc-color);
+  color: var(--sc-color);
+  transform: translateY(-2px);
+}
+
+/* Utility */
+.container {
+  width: 100%;
+  max-width: 1320px;
+  margin: 0 auto;
+  padding: 0 6vw;
+}
