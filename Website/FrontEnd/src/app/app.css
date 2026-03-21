@@ -6,6 +6,9 @@
     --sc-light-color:#FF5F00;
     --charcoal:#1e1e1e;
     --background-color:#fdf4e8;
+    --border-color: #e8ddd0;
+
+    /* Fonts */
     --font-display: 'Playfair Display', Georgia, serif;
     --font-body: 'Lato', 'Trebuchet MS', sans-serif;
 

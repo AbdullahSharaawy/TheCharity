@@ -1,6 +1,4 @@
 :host { display: block; }
-
-/* -- HERO ---------------------------------- */
 .welcome {
   background: var(--off-white);
   position: relative;
@@ -23,23 +21,6 @@
 @keyframes fadeUp {
   from { opacity:0; transform:translateY(28px); }
   to   { opacity:1; transform:translateY(0); }
-}
-
-.welcome_eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 700;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--sc-color);
-  background: #e8f4eb;
-  border: 1px solid #c0ddc9;
-  border-radius: 999px;
-  padding: 6px 16px;
-  margin-bottom: 1.8rem;
 }
 
 .welcome_headline {
@@ -71,36 +52,6 @@
   gap: 1rem;
   flex-wrap: wrap;
   margin-bottom: 3rem;
-}
-.cta {
-  font-family: var(--font-body);
-  font-size: 1rem;
-  font-weight: 700;
-  padding: 0.9rem 2.1rem;
-  border-radius: 50px;
-  text-decoration: none;
-  transition: all 0.22s ease;
-  cursor: pointer;
-}
-.cta--primary {
-  background: var(--pr-color);
-  color: #fff;
-  box-shadow: 0 4px 18px rgba(196,98,45,.32);
-}
-.cta--primary:hover {
-  background: #b0561f;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 26px rgba(196,98,45,.4);
-}
-.cta--secondary {
-  background: transparent;
-  color: var(--charcoal);
-  border: 2px solid #d1c4b4;
-}
-.cta--secondary:hover {
-  border-color: var(--sc-color);
-  color: var(--sc-color);
-  transform: translateY(-2px);
 }
 
 /* Trust row */
@@ -198,7 +149,6 @@
 .thumb-amber { background: linear-gradient(135deg, #fde68a, #fbbf24); }
 .thumb-green { background: linear-gradient(135deg, #bbf7d0, #34d399); }
 .thumb-rose  { background: linear-gradient(135deg, #fce7f3, #f9a8d4); }
-.thumb-emoji { font-size: 2.8rem; }
 
 .camp-card_body {
   padding: 12px 14px 14px;
@@ -230,7 +180,7 @@
 
 .camp-progress {
   height: 5px;
-  background: #f0e8dc;
+  background: --background-color;
   border-radius: 999px;
   overflow: hidden;
   margin-bottom: 6px;
