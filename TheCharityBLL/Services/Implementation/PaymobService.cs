@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using TheCharityBLL.DTOs.PaymentDTOs;
 using TheCharityBLL.Services.Abstraction.Payment;
 
 namespace TheCharityBLL.Services.Repository
@@ -26,6 +27,11 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<string> CreatePayment(decimal amount, string currency = "EGP")
         {
+            return await CreatePayment(amount, metadata: null, billingData: null, currency);
+        }
+
+        public async Task<string> CreatePayment(decimal amount, PaymentOrderMetadata? metadata, BillingData? billingData, string currency = "EGP")
+        {
             // ── Step 1: Authentication ──────────────────────────────────────
             var authBody = JsonSerializer.Serialize(new { api_key = _apiKey });
 
@@ -47,20 +53,21 @@ namespace TheCharityBLL.Services.Repository
 
             var authToken = authTokenEl.GetString()!;
 
-            // ── Step 2: Create Order ────────────────────────────────────────
-            var orderBody = JsonSerializer.Serialize(new
+             var orderBody = JsonSerializer.Serialize(new
             {
-                auth_token = authToken,          // ← required in body
+                auth_token = authToken,
                 amount_cents = (int)(amount * 100),
                 currency,
-                delivery_needed = false,         // ← bool not string
+                delivery_needed = false,
                 items = Array.Empty<object>()
-            });
 
-            // Clear previous headers to avoid conflicts
+             });
+
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", authToken);
-
+            
+           
+            
             var orderResponse = await _httpClient.PostAsync(
                 "https://accept.paymob.com/api/ecommerce/orders",
                 new StringContent(orderBody, Encoding.UTF8, "application/json")
@@ -78,6 +85,10 @@ namespace TheCharityBLL.Services.Repository
                 throw new Exception($"Paymob order response missing 'id'. Response: {orderContent}");
 
             var orderId = orderIdEl.GetInt64();
+           
+            var resolvedBilling = ResolveBillingData(billingData);
+
+
 
             // ── Step 3: Payment Key ─────────────────────────────────────────
             var paymentBody = JsonSerializer.Serialize(new
@@ -88,21 +99,12 @@ namespace TheCharityBLL.Services.Repository
                 order_id = orderId,
                 currency,
                 integration_id = int.Parse(_integrationId),
-                billing_data = new
+               
+                billing_data = resolvedBilling,
+                extra = new Dictionary<string, string>
                 {
-                    first_name = "Customer",
-                    last_name = "Name",
-                    email = "customer@example.com",
-                    phone_number = "+201000000000",
-                    apartment = "NA",
-                    floor = "NA",
-                    street = "NA",
-                    building = "NA",
-                    shipping_method = "NA",
-                    postal_code = "NA",
-                    city = "NA",
-                    country = "EG",
-                    state = "NA"
+                    ["user_id"] = metadata?.UserId ?? "",
+                    ["campaign_id"] = metadata?.CampaignId.ToString() ?? ""
                 }
             });
 
@@ -126,6 +128,45 @@ namespace TheCharityBLL.Services.Repository
 
             // ── Step 4: Return iFrame URL ───────────────────────────────────
             return $"https://accept.paymob.com/api/acceptance/iframes/{_iframeId}?payment_token={paymentKey}";
+        }
+        private static object ResolveBillingData(BillingData? billing)
+        {
+            if (billing is null)
+            {
+                return new
+                {
+                    first_name = "NA",
+                    last_name = "NA",
+                    email = "NA",
+                    phone_number = "NA",
+                    apartment = "NA",
+                    floor = "NA",
+                    street = "NA",
+                    building = "NA",
+                    shipping_method = "NA",
+                    postal_code = "NA",
+                    city = "NA",
+                    country = "EG",
+                    state = "NA"
+                };
+            }
+
+            return new
+            {
+                first_name = billing.FirstName ?? "NA",
+                last_name = billing.LastName ?? "NA",
+                email = billing.Email ?? "NA",
+                phone_number = billing.PhoneNumber ?? "NA",
+                apartment = billing.Apartment ?? "NA",
+                floor = billing.Floor ?? "NA",
+                street = billing.Street ?? "NA",
+                building = billing.Building ?? "NA",
+                shipping_method = "NA",
+                postal_code = billing.PostalCode ?? "NA",
+                city = billing.City ?? "NA",
+                country = billing.Country ?? "EG",
+                state = billing.State ?? "NA"
+            };
         }
     }
 }

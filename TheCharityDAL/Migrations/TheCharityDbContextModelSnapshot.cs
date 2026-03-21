@@ -217,7 +217,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("DonatedItemId1");
 
-                    b.ToTable("Attachments");
+                    b.ToTable("Attachments", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.Campaign", b =>
@@ -328,7 +328,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("OrganizationId");
 
-                    b.ToTable("DonatedItems");
+                    b.ToTable("DonatedItems", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.Donation", b =>
@@ -367,7 +367,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Donations");
+                    b.ToTable("Donations", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.ItemImage", b =>
@@ -403,7 +403,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("DonatedItemId");
 
-                    b.ToTable("ItemImages");
+                    b.ToTable("ItemImages", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.Organization", b =>
@@ -439,7 +439,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("PaymentId");
 
-                    b.ToTable("Organizations");
+                    b.ToTable("Organizations", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.OrganizationContactMethod", b =>
@@ -475,7 +475,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasIndex("CompanyId");
 
-                    b.ToTable("OrganizationContactMethods");
+                    b.ToTable("OrganizationContactMethods", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.PaymentInfo", b =>
@@ -512,7 +512,7 @@ namespace TheCharityDAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("PaymentsInfo");
+                    b.ToTable("PaymentsInfo", (string)null);
                 });
 
             modelBuilder.Entity("TheCharityDAL.Entities.User", b =>
