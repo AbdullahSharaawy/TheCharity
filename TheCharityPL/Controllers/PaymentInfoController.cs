@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using TheCharityBLL.DTOs.PaymentInfoDTOs;
 using TheCharityBLL.Services.Abstraction.Payment;
@@ -96,6 +97,8 @@ namespace TheCharityPL.Controllers
             {
                
                 var created = await _paymentInfoService.CreatePaymentInfoAsync( dto);
+                if (created == null)
+                    return BadRequest(new {message="The Organization Id isn`t Valid."});
 
                 _logger.LogInformation("Payment info created successfully with ID: {PaymentInfoId}",
                     created.Id);
@@ -125,6 +128,8 @@ namespace TheCharityPL.Controllers
                 _logger.LogInformation("Updating payment info with ID: {PaymentInfoId}", paymentInfoId);
 
                 var updated = await _paymentInfoService.UpdatePaymentInfoAsync(paymentInfoId, dto);
+                if (updated == null)
+                    return BadRequest(new { message = "The OrganizationId isn`t Valid." });
 
                 _logger.LogInformation("Payment info updated successfully with ID: {PaymentInfoId}", paymentInfoId);
 
@@ -195,7 +200,8 @@ namespace TheCharityPL.Controllers
                 _logger.LogInformation("Restoring payment info with ID: {PaymentInfoId}", paymentInfoId);
 
           
-                await _paymentInfoService.RestorePaymentInfoAsync(paymentInfoId);
+               if( ! await _paymentInfoService.RestorePaymentInfoAsync(paymentInfoId))
+                    return BadRequest(new { message = "PaymentInfo Id isn`t valid." });
 
                 _logger.LogInformation("Payment info restored successfully with ID: {PaymentInfoId}", paymentInfoId);
 

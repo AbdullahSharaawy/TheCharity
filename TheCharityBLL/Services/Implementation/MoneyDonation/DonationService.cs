@@ -8,7 +8,7 @@ using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.MoneyDonation;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.MoneyDonation
 {
     public class DonationService : IDonationService
     {

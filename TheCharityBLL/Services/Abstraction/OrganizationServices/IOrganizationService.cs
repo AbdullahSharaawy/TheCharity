@@ -15,7 +15,7 @@ namespace TheCharityBLL.Services.Abstraction.Organization
         Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name);
 
         Task<ServiceResponse<int>> AddOrganization(CreateOrganizationDto createOrganizationDto);
-        Task<ServiceResponse<bool>> UpdateOrganization(UpdateOrganizationDto updateOrganizationDto);
+        Task<ServiceResponse<bool>> UpdateOrganization(int id,UpdateOrganizationDto updateOrganizationDto);
 
         Task<ServiceResponse<bool>> DeleteOrganization(int id);
         Task<ServiceResponse<bool>> RestoreOrganization(int id);

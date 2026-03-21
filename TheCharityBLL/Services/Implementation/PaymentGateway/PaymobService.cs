@@ -6,7 +6,7 @@ using System.Text.Json;
 using TheCharityBLL.DTOs.PaymentDTOs;
 using TheCharityBLL.Services.Abstraction.Payment;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.PaymentGateway
 {
     public class PaymobService : IPaymobService
     {
@@ -53,7 +53,7 @@ namespace TheCharityBLL.Services.Repository
 
             var authToken = authTokenEl.GetString()!;
 
-             var orderBody = JsonSerializer.Serialize(new
+            var orderBody = JsonSerializer.Serialize(new
             {
                 auth_token = authToken,
                 amount_cents = (int)(amount * 100),
@@ -61,13 +61,13 @@ namespace TheCharityBLL.Services.Repository
                 delivery_needed = false,
                 items = Array.Empty<object>()
 
-             });
+            });
 
             _httpClient.DefaultRequestHeaders.Authorization =
                 new AuthenticationHeaderValue("Bearer", authToken);
-            
-           
-            
+
+
+
             var orderResponse = await _httpClient.PostAsync(
                 "https://accept.paymob.com/api/ecommerce/orders",
                 new StringContent(orderBody, Encoding.UTF8, "application/json")
@@ -85,7 +85,7 @@ namespace TheCharityBLL.Services.Repository
                 throw new Exception($"Paymob order response missing 'id'. Response: {orderContent}");
 
             var orderId = orderIdEl.GetInt64();
-           
+
             var resolvedBilling = ResolveBillingData(billingData);
 
 
@@ -99,7 +99,7 @@ namespace TheCharityBLL.Services.Repository
                 order_id = orderId,
                 currency,
                 integration_id = int.Parse(_integrationId),
-               
+
                 billing_data = resolvedBilling,
                 extra = new Dictionary<string, string>
                 {

@@ -1,11 +1,10 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.Organization;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.OrganizationService
 {
     public class OrganizationService : IOrganizationService
     {
@@ -91,7 +90,7 @@ namespace TheCharityBLL.Services.Repository
         {
             //payment info
             var organization = await _repository.GetOrganizationByIdAsync(id);
-            if(organization == null)
+            if (organization == null)
             {
                 return new ServiceResponse<OrganizationResponseDto>
                 {
@@ -111,7 +110,7 @@ namespace TheCharityBLL.Services.Repository
         public async Task<ServiceResponse<OrganizationDetailsResponseDto>> GetOrganizationByIdWithDetails(int id)
         {
             var organization = await _repository.GetOrganizationWithDetailsAsync(id);
-            if(organization == null)
+            if (organization == null)
             {
                 return new ServiceResponse<OrganizationDetailsResponseDto>
                 {
@@ -131,7 +130,7 @@ namespace TheCharityBLL.Services.Repository
         public async Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name)
         {
             var organization = await _repository.GetOrganizationByNameAsync(name);
-            if(organization == null)
+            if (organization == null)
             {
                 return new ServiceResponse<OrganizationResponseDto>
                 {
@@ -169,22 +168,22 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<bool>> UpdateOrganization( UpdateOrganizationDto updateOrganizationDto)
+        public async Task<ServiceResponse<bool>> UpdateOrganization(int id,UpdateOrganizationDto updateOrganizationDto)
         {
             //validation
 
             //
-           
-            var existingOrganization = await _repository.GetOrganizationByIdAsync(updateOrganizationDto.Id);
+
+            var existingOrganization = await _repository.GetOrganizationByIdAsync(id);
             if (existingOrganization == null)
             {
                 return new ServiceResponse<bool>
                 {
                     Success = false,
-                    Message = $"Organization with ID {updateOrganizationDto.Id} not found.",
+                    Message = $"Organization with ID {id} not found.",
                 };
             }
-            if(existingOrganization.Name != updateOrganizationDto.Name)
+            if (existingOrganization.Name != updateOrganizationDto.Name)
             {
                 if (await _repository.OrganizationNameExistsAsync(updateOrganizationDto.Name))
                 {

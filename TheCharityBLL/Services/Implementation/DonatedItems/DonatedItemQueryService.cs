@@ -1,5 +1,4 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.DonatedItems;
@@ -7,7 +6,7 @@ using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.DonatedItems
 {
     public class DonatedItemQueryService : IDonatedItemQueryService
     {
@@ -264,7 +263,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<DonatedItemResponseDto>>> GetDonatedItemsWithAttachments()
         {
-            var itemsWithAttachments =await _repository.GetDonatedItemsWithAttachmentsAsync();
+            var itemsWithAttachments = await _repository.GetDonatedItemsWithAttachmentsAsync();
             var donatedItemDtos = _mapper.MapToDonatedItemResponseDtos(itemsWithAttachments);
             return new ServiceResponse<IEnumerable<DonatedItemResponseDto>>
             {
@@ -274,6 +273,6 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        
+
     }
 }

@@ -1,5 +1,4 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityBLL.Helpers;
 using TheCharityBLL.Mapper;
@@ -8,7 +7,7 @@ using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.DonatedItems
 {
     public class DonatedItemService : IDonatedItemService
     {
@@ -39,11 +38,11 @@ namespace TheCharityBLL.Services.Repository
                     var fileName = FileManager.UploadFile("DonatedItems/Images", donatedItem.ImageFiles[i]);
                     if (fileName.StartsWith("/"))
                     {
-                        bool isMain = (i == 0);
+                        bool isMain = i == 0;
                         var itemImage = new ItemImage(fileName, null) { IsMain = isMain };
                         donatedItemEntity.AddImage(itemImage);
                     }
-                    
+
                 }
             }
             if (donatedItem.AttachmentFiles != null && donatedItem.AttachmentFiles.Any())
@@ -64,7 +63,7 @@ namespace TheCharityBLL.Services.Repository
 
                         donatedItemEntity.AddItemAttachment(itemAttachment);
                     }
-                   
+
                 }
             }
 
@@ -193,7 +192,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<bool>> UpdateDonatedItem(UpdateDonatedItemDto donatedItem)
         {
-            var existingItem =await _repository.GetDonatedItemByIdAsync(donatedItem.Id);
+            var existingItem = await _repository.GetDonatedItemByIdAsync(donatedItem.Id);
             if (existingItem == null)
             {
                 return new ServiceResponse<bool>
@@ -202,7 +201,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donated Item with ID {donatedItem.Id} not found.",
                 };
             }
-            existingItem.EditAvailability(donatedItem.IsAvailable ?? existingItem.IsAvailable); 
+            existingItem.EditAvailability(donatedItem.IsAvailable ?? existingItem.IsAvailable);
             existingItem.EditDescription(donatedItem.Description ?? existingItem.Description);
             existingItem.EditItemCategory(donatedItem.ItemCategory ?? existingItem.ItemCategory);
             existingItem.EditName(donatedItem.Name ?? existingItem.Name);
@@ -263,13 +262,13 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donated Item with ID {itemId} not found.",
                 };
             }
-                if (!await _repository.IsDonorAsync(newDonorId))
+            if (!await _repository.IsDonorAsync(newDonorId))
+            {
+                return new ServiceResponse<bool>()
                 {
-                    return new ServiceResponse<bool>()
-                    {
-                        Success = false,
-                        Message = $"Donor with ID {newDonorId} not found.",
-                    };
+                    Success = false,
+                    Message = $"Donor with ID {newDonorId} not found.",
+                };
             }
             var update = await _repository.UpdateItemDonorAsync(itemId, newDonorId);
             return new ServiceResponse<bool>
@@ -293,7 +292,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> BulkMarkItemsAsUnavailable(int organizationId)
         {
-            if(!await _organizationRepository.OrganizationExistsAsync(organizationId))
+            if (!await _organizationRepository.OrganizationExistsAsync(organizationId))
             {
                 return new ServiceResponse<int>
                 {
@@ -312,7 +311,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> DeleteOldDonatedItems(int daysOld)
         {
-            var delete =await _repository.DeleteOldDonatedItemsAsync(daysOld);
+            var delete = await _repository.DeleteOldDonatedItemsAsync(daysOld);
             return new ServiceResponse<int>
             {
                 Success = true,

@@ -16,6 +16,6 @@ namespace TheCharityBLL.DTOs.OrganizationDTOs
         [MaxLength(500, ErrorMessage = "Address cannot exceed 500 characters.")]
         public string Address { get; set; }
 
-        public int? PaymentId { get; set; }
+        
     }
 }
