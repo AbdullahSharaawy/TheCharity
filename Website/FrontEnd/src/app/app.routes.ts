@@ -1,9 +1,9 @@
 import { Routes } from '@angular/router';
 import { MainPage } from './Pages/main-page/main-page';
-import { OrgUserChoice } from './Pages/org-user-choice/org-user-choice';
+import { SignIn } from './Pages/sign-in/sign-in';
 
 export const routes: Routes = [
   { path: '', component: MainPage },
-  { path: 'org-user-choice', component: OrgUserChoice },
+  { path: 'sign-in', component: SignIn },
   // add routes here
 ];
