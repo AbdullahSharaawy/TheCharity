@@ -61,8 +61,8 @@ namespace TheCharityPL.Controllers
         [HttpPut("{id:int}")]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateOrganizationDto dto)
         {
-            dto.Id = id;
-            var result = await _organizationService.UpdateOrganization(dto);
+            
+            var result = await _organizationService.UpdateOrganization(id,dto);
             return HandleResponse(result, notFoundOnFailure: true);
         }
 

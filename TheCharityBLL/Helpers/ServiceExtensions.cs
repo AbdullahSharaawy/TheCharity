@@ -19,6 +19,10 @@ using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityBLL.Services.Abstraction.Organization;
 using TheCharityBLL.Services.Abstraction.Payment;
 using TheCharityBLL.Services.Abstraction.MoneyDonation;
+using TheCharityBLL.Services.Implementation.DonatedItems;
+using TheCharityBLL.Services.Implementation.PaymentGateway;
+using TheCharityBLL.Services.Implementation.MoneyDonation;
+using TheCharityBLL.Services.Implementation.OrganizationService;
 namespace TheCharityBLL.Helpers
 {
     public static class ServiceExtensions

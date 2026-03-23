@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,7 +11,7 @@ using TheCharityBLL.Services.Abstraction.Payment;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.PaymentGateway
 {
     public class PaymentInfoService : IPaymentInfoService
     {
@@ -47,8 +48,9 @@ namespace TheCharityBLL.Services.Repository
                 _logger.LogInformation("No payment info found for organization ID {OrganizationId}.", organizationId);
                 return null;
             }
-
-            return _mapper.Map<PaymentInfoResponseDto>(paymentInfo);
+            var paymentInfoResponseDto = _mapper.Map<PaymentInfoResponseDto>(paymentInfo);
+            paymentInfoResponseDto.OrganizationId = organizationId;
+            return paymentInfoResponseDto;
         }
 
         public async Task<PaymentInfoResponseDto?> GetPaymentInfoByIdAsync(int paymentInfoId)
@@ -61,25 +63,49 @@ namespace TheCharityBLL.Services.Repository
                 _logger.LogWarning("PaymentInfo with ID {PaymentInfoId} was not found.", paymentInfoId);
                 throw new KeyNotFoundException($"PaymentInfo with ID {paymentInfoId} was not found.");
             }
+            var paymentInfoResponseDto = _mapper.Map<PaymentInfoResponseDto>(paymentInfo);
+            var or = await _organizationRepository.GetOrganizationByPaymentInfoIdAsync(paymentInfoId);
 
-            return _mapper.Map<PaymentInfoResponseDto>(paymentInfo);
+            if (or != null)
+                paymentInfoResponseDto.OrganizationId = or.Id;
+            else
+                paymentInfoResponseDto.OrganizationId = null;
+
+            return paymentInfoResponseDto;
         }
 
-        public async Task<PaymentInfoResponseDto> CreatePaymentInfoAsync( CreatePaymentInfoDto dto)
+        public async Task<PaymentInfoResponseDto?> CreatePaymentInfoAsync(CreatePaymentInfoDto dto)
         {
-           
+            var organization = await _organizationRepository.GetOrganizationByIdAsync(dto.OrganizationId);
+
+            if (organization == null)
+                return null;
+
             var paymentInfo = _mapper.Map<PaymentInfo>(dto);
             var created = await _organizationRepository.AddPaymentInfoAsync(paymentInfo);
 
+            organization.EditPaymentInfoId(created.Id);
+
+            await _organizationRepository.UpdateOrganizationAsync(organization);
+
             _logger.LogInformation("Payment info created with ID {PaymentInfoId} .",
                 created.Id);
-
-            return _mapper.Map<PaymentInfoResponseDto>(created);
+            var responseDto = _mapper.Map<PaymentInfoResponseDto>(created);
+            responseDto.OrganizationId = dto.OrganizationId;
+            return responseDto;
         }
 
-        public async Task<PaymentInfoResponseDto> UpdatePaymentInfoAsync(int paymentInfoId, UpdatePaymentInfoDto dto)
+        public async Task<PaymentInfoResponseDto?> UpdatePaymentInfoAsync(int paymentInfoId, UpdatePaymentInfoDto dto)
         {
             _logger.LogInformation("Updating payment info with ID {PaymentInfoId}.", paymentInfoId);
+
+            var organization = await _organizationRepository.GetOrganizationByIdAsync(dto.OrganizationId);
+
+            if (organization == null)
+            {
+                _logger.LogInformation("the organization id  is invalid during Updating payment info with ID {PaymentInfoId}.", paymentInfoId);
+                return null;
+            }
 
             var paymentInfo = await _organizationRepository.GetPaymentInfoByIdAsync(paymentInfoId);
             if (paymentInfo == null)
@@ -94,6 +120,28 @@ namespace TheCharityBLL.Services.Repository
                 throw new InvalidOperationException($"PaymentInfo with ID {paymentInfoId} is deleted and cannot be updated.");
             }
 
+            /// remove paymentinfo id from the old organization
+            var OldOrganization = await _organizationRepository.GetOrganizationByPaymentInfoIdAsync(paymentInfoId);
+            if (OldOrganization == null)
+            {
+                var or = await UpdatePaymentInfoIdOfOrganization(paymentInfoId, dto.OrganizationId);
+                if (or is null)
+                    return null;
+            }
+            else if (OldOrganization.Id != dto.OrganizationId)
+            {
+                OldOrganization.EditPaymentInfoId(null);
+
+                await _organizationRepository.UpdateOrganizationAsync(OldOrganization);
+                /// add paymentinfo id to the new organization
+
+                var or = await UpdatePaymentInfoIdOfOrganization(paymentInfoId, dto.OrganizationId);
+                if (or is null)
+                    return null;
+            }
+
+
+
             if (!string.IsNullOrWhiteSpace(dto.ApiKey))
                 paymentInfo.EditApiKey(dto.ApiKey);
 
@@ -107,12 +155,23 @@ namespace TheCharityBLL.Services.Repository
                 paymentInfo.EditHmacKey(dto.HmacKey);
 
             var updated = await _organizationRepository.UpdatePaymentInfoAsync(paymentInfo);
-
+            var responsedto = _mapper.Map<PaymentInfoResponseDto>(updated);
+            responsedto.OrganizationId = dto.OrganizationId;
             _logger.LogInformation("Payment info with ID {PaymentInfoId} updated successfully.", paymentInfoId);
 
-            return _mapper.Map<PaymentInfoResponseDto>(updated);
+            return responsedto;
         }
+        private async Task<Organization?> UpdatePaymentInfoIdOfOrganization(int paymentInfoId, int organizationId)
+        {
+            var NewOrganization = await _organizationRepository.GetOrganizationByIdAsync(organizationId);
 
+            if (NewOrganization == null)
+                return null;
+
+            NewOrganization.EditPaymentInfoId(paymentInfoId);
+
+            return await _organizationRepository.UpdateOrganizationAsync(NewOrganization);
+        }
         public async Task DeletePaymentInfoAsync(int paymentInfoId)
         {
             _logger.LogInformation("Deleting payment info with ID {PaymentInfoId}.", paymentInfoId);
@@ -136,15 +195,22 @@ namespace TheCharityBLL.Services.Repository
         }
 
         // PaymentInfoService.cs
-        public async Task RestorePaymentInfoAsync(int paymentInfoId)
+        public async Task<bool> RestorePaymentInfoAsync(int paymentInfoId)
         {
             _logger.LogInformation("Restoring payment info with ID {PaymentInfoId}.", paymentInfoId);
 
-             var exists = await _organizationRepository.OrganizationExistsAsync(paymentInfoId); // not useful here
+            var exists = await _organizationRepository.GetPaymentInfoByIdAsync(paymentInfoId); // not useful here
+            if (exists == null)
+            {
+                _logger.LogInformation("payment info with ID {PaymentInfoId} doesn`t exists.", paymentInfoId);
+
+                return false;
+            }
 
             await _organizationRepository.RestorePaymentInfoAsync(paymentInfoId);
 
             _logger.LogInformation("Payment info with ID {PaymentInfoId} restored successfully.", paymentInfoId);
+            return true;
         }
 
         // ===== Utilities =====

@@ -1,12 +1,11 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.ItemImageDTOs;
 using TheCharityBLL.Helpers;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.DonatedItems
 {
     public class DonatedItemImageService : IDonatedItemImageService
     {
@@ -121,7 +120,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<ItemImageResponseDto>>> GetItemImages(int donatedItemId)
         {
-            if(!await _repository.DonatedItemExistsAsync(donatedItemId))
+            if (!await _repository.DonatedItemExistsAsync(donatedItemId))
             {
                 return new ServiceResponse<IEnumerable<ItemImageResponseDto>>
                 {

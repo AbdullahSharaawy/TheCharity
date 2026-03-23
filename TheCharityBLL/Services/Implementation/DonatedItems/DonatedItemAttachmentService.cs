@@ -1,5 +1,4 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.AttachmentDTOs;
 using TheCharityBLL.Helpers;
 using TheCharityBLL.Mapper;
@@ -7,7 +6,7 @@ using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityDAL.Entities;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.DonatedItems
 {
     public class DonatedItemAttachmentService : IDonatedItemAttachmentService
     {
@@ -43,7 +42,7 @@ namespace TheCharityBLL.Services.Repository
 
             }
             var attachmentEntity = _mapper.MapToAttachment(attachment);
-            var create=await _repository.AddAttachmentAsync(attachmentEntity);
+            var create = await _repository.AddAttachmentAsync(attachmentEntity);
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -55,8 +54,8 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<bool>> DeleteAttachment(int attachmentId)
         {
-            var attachment =await _repository.GetAttachmentByIdAsync(attachmentId);
-            if(attachment == null)
+            var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+            if (attachment == null)
             {
                 return new ServiceResponse<bool>
                 {
@@ -78,7 +77,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<AttachmentResponseDto>>> GetAllAttachments(int donatedItemId)
         {
-            if(await _repository.DonatedItemExistsAsync(donatedItemId) == false)
+            if (await _repository.DonatedItemExistsAsync(donatedItemId) == false)
             {
                 return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
                 {
@@ -86,7 +85,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donated item with id {donatedItemId} not found.",
                 };
             }
-            var attachments =await _repository.GetAllAttachmentsAsync(donatedItemId);
+            var attachments = await _repository.GetAllAttachmentsAsync(donatedItemId);
             var attachmentsDto = _mapper.MapToAttachmentResponseDtos(attachments);
             return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
             {
@@ -98,8 +97,8 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<AttachmentResponseDto>> GetAttachmentById(int attachmentId)
         {
-            var attachment =await _repository.GetAttachmentByIdAsync(attachmentId);
-            if(attachment == null)
+            var attachment = await _repository.GetAttachmentByIdAsync(attachmentId);
+            if (attachment == null)
             {
                 return new ServiceResponse<AttachmentResponseDto>
                 {
@@ -118,7 +117,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<AttachmentResponseDto>>> GetItemAttachments(int donatedItemId)
         {
-            if(await _repository.DonatedItemExistsAsync(donatedItemId) == false)
+            if (await _repository.DonatedItemExistsAsync(donatedItemId) == false)
             {
                 return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
                 {
@@ -126,7 +125,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donated item with id {donatedItemId} not found.",
                 };
             }
-            var attachments =await _repository.GetItemAttachmentsAsync(donatedItemId);
+            var attachments = await _repository.GetItemAttachmentsAsync(donatedItemId);
             var attachmentsDto = _mapper.MapToAttachmentResponseDtos(attachments);
             return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
             {
@@ -138,7 +137,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<AttachmentResponseDto>>> GetRecipientAttachments(int donatedItemId)
         {
-            if(await _repository.DonatedItemExistsAsync(donatedItemId) == false)
+            if (await _repository.DonatedItemExistsAsync(donatedItemId) == false)
             {
                 return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
                 {
@@ -146,7 +145,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donated item with id {donatedItemId} not found.",
                 };
             }
-            var attachments =await _repository.GetRecipientAttachmentsAsync(donatedItemId);
+            var attachments = await _repository.GetRecipientAttachmentsAsync(donatedItemId);
             var attachmentsDto = _mapper.MapToAttachmentResponseDtos(attachments);
             return new ServiceResponse<IEnumerable<AttachmentResponseDto>>
             {

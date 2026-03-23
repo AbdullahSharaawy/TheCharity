@@ -11,10 +11,10 @@ namespace TheCharityBLL.Services.Abstraction.Payment
     {
         Task<PaymentInfoResponseDto?> GetPaymentInfoByOrganizationIdAsync(int organizationId);
         Task<PaymentInfoResponseDto?> GetPaymentInfoByIdAsync(int paymentInfoId);
-        Task<PaymentInfoResponseDto> CreatePaymentInfoAsync(CreatePaymentInfoDto dto);
+        Task<PaymentInfoResponseDto?> CreatePaymentInfoAsync(CreatePaymentInfoDto dto);
         Task<PaymentInfoResponseDto> UpdatePaymentInfoAsync(int paymentInfoId, UpdatePaymentInfoDto dto);
         Task DeletePaymentInfoAsync(int paymentInfoId);
-        Task RestorePaymentInfoAsync(int paymentInfoId);
+        Task<bool> RestorePaymentInfoAsync(int paymentInfoId);
 
         Task<bool> HasPaymentInfoAsync(int organizationId);
         Task<bool> ValidatePaymentInfoAsync(int organizationId);

@@ -1,12 +1,11 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.Organization;
 using TheCharityDAL.Enums;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.OrganizationService
 {
     public class OrganizationQueryService : IOrganizationQueryService
     {

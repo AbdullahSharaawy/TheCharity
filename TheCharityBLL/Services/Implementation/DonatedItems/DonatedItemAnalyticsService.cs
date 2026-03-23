@@ -1,5 +1,4 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.DonatedItemDTOs;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction;
@@ -7,7 +6,7 @@ using TheCharityBLL.Services.Abstraction.DonatedItems;
 using TheCharityDAL.Enums;
 using TheCharityDAL.Repositories.Abstraction;
 
-namespace TheCharityBLL.Services.Repository
+namespace TheCharityBLL.Services.Implementation.DonatedItems
 {
     public class DonatedItemAnalyticsService : IDonatedItemAnalyticsService
     {
@@ -33,7 +32,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetAvailableDonatedItemsCount()
         {
-            var count =await _repository.GetAvailableDonatedItemsCountAsync();
+            var count = await _repository.GetAvailableDonatedItemsCountAsync();
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -49,7 +48,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetDonatedItemsCountByCategory(ItemCategory category)
         {
-            var count =await _repository.GetDonatedItemsCountByCategoryAsync(category);
+            var count = await _repository.GetDonatedItemsCountByCategoryAsync(category);
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -60,7 +59,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetDonatedItemsCountByOrganization(int organizationId)
         {
-            if(!await _organizationRepository.OrganizationExistsAsync(organizationId))
+            if (!await _organizationRepository.OrganizationExistsAsync(organizationId))
             {
                 return new ServiceResponse<int>
                 {
@@ -68,7 +67,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Organization with ID {organizationId} does not exist."
                 };
             }
-            var count =await _repository.GetDonatedItemsCountByOrganizationAsync(organizationId);
+            var count = await _repository.GetDonatedItemsCountByOrganizationAsync(organizationId);
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -79,7 +78,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<Dictionary<ItemCategory, int>>> GetDonatedItemsCountToAllCategories()
         {
-            var categoryCounts =await _repository.GetDonatedItemsCountToAllCategoriesAsync();
+            var categoryCounts = await _repository.GetDonatedItemsCountToAllCategoriesAsync();
             return new ServiceResponse<Dictionary<ItemCategory, int>>
             {
                 Success = true,
@@ -90,7 +89,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<Dictionary<DateTime, int>>> GetDonatedItemsTrend(int days)
         {
-            var trendData =await _repository.GetDonatedItemsTrendAsync(days);
+            var trendData = await _repository.GetDonatedItemsTrendAsync(days);
             return new ServiceResponse<Dictionary<DateTime, int>>
             {
                 Success = true,
@@ -101,7 +100,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<ItemCategory>> GetDonorMostCommonCategory(string donorId)
         {
-            if(await _repository.IsDonorAsync(donorId))
+            if (await _repository.IsDonorAsync(donorId))
             {
                 return new ServiceResponse<ItemCategory>
                 {
@@ -109,7 +108,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donor with ID {donorId} does not exist."
                 };
             }
-            var category =await _repository.GetDonorMostCommonCategoryAsync(donorId);
+            var category = await _repository.GetDonorMostCommonCategoryAsync(donorId);
             return new ServiceResponse<ItemCategory>
             {
                 Success = true,
@@ -120,7 +119,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetDonorTotalDonatedItemsCount(string donorId)
         {
-            if(!await _repository.IsDonorAsync(donorId))
+            if (!await _repository.IsDonorAsync(donorId))
             {
                 return new ServiceResponse<int>
                 {
@@ -128,7 +127,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Donor with ID {donorId} does not exist."
                 };
             }
-            var count =await _repository.GetDonorTotalDonatedItemsCountAsync(donorId);
+            var count = await _repository.GetDonorTotalDonatedItemsCountAsync(donorId);
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -139,8 +138,8 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<IEnumerable<DonatedItemResponseDto>>> GetMostRecentDonatedItems(int limit)
         {
-            var recentItems =await _repository.GetMostRecentDonatedItemsAsync(limit);
-            var recentItemsDto =_mapper.MapToDonatedItemResponseDtos(recentItems);
+            var recentItems = await _repository.GetMostRecentDonatedItemsAsync(limit);
+            var recentItemsDto = _mapper.MapToDonatedItemResponseDtos(recentItems);
             return new ServiceResponse<IEnumerable<DonatedItemResponseDto>>
             {
                 Success = true,
@@ -151,7 +150,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetOrganizationAvailableItemsCount(int organizationId)
         {
-            if(!await _organizationRepository.OrganizationExistsAsync(organizationId))
+            if (!await _organizationRepository.OrganizationExistsAsync(organizationId))
             {
                 return new ServiceResponse<int>
                 {
@@ -159,7 +158,7 @@ namespace TheCharityBLL.Services.Repository
                     Message = $"Organization with ID {organizationId} does not exist."
                 };
             }
-            var count =await _repository.GetOrganizationAvailableItemsCountAsync(organizationId);
+            var count = await _repository.GetOrganizationAvailableItemsCountAsync(organizationId);
             return new ServiceResponse<int>
             {
                 Success = true,
@@ -170,7 +169,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<Dictionary<ItemCategory, int>>> GetOrganizationInventoryByCategory(int organizationId)
         {
-            var inventoryData =await _repository.GetOrganizationInventoryByCategoryAsync(organizationId);
+            var inventoryData = await _repository.GetOrganizationInventoryByCategoryAsync(organizationId);
             return new ServiceResponse<Dictionary<ItemCategory, int>>
             {
                 Success = true,
@@ -181,7 +180,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<Dictionary<string, int>>> GetTopDonors(int limit)
         {
-            var topDonors =await _repository.GetTopDonorsAsync(limit);
+            var topDonors = await _repository.GetTopDonorsAsync(limit);
             return new ServiceResponse<Dictionary<string, int>>
             {
                 Success = true,
@@ -192,7 +191,7 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<Dictionary<int, int>>> GetTopOrganizationsByDonations(int limit)
         {
-            var topOrganizations =await _repository.GetTopOrganizationsByDonationsAsync(limit);
+            var topOrganizations = await _repository.GetTopOrganizationsByDonationsAsync(limit);
             return new ServiceResponse<Dictionary<int, int>>
             {
                 Success = true,
@@ -203,12 +202,13 @@ namespace TheCharityBLL.Services.Repository
 
         public async Task<ServiceResponse<int>> GetTotalDonatedItemsCount()
         {
-            var count =await _repository.GetTotalDonatedItemsCountAsync();
-            return new ServiceResponse<int> {
+            var count = await _repository.GetTotalDonatedItemsCountAsync();
+            return new ServiceResponse<int>
+            {
                 Success = true,
                 Data = count,
                 Message = "Total donated items count retrieved successfully."
-            };              
+            };
         }
     }
 }
