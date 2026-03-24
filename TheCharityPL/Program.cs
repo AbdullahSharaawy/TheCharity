@@ -34,11 +34,10 @@ namespace TheCharityPL
             app.MapHealthChecks("/health");
 
             // Configure the HTTP request pipeline.
-            if (app.Environment.IsDevelopment())
-            {
+           
                 app.UseSwagger();
                 app.UseSwaggerUI();
-            }
+           
 
             //global exception handling middleware
             app.UseMiddleware<ExceptionMiddleware>();
