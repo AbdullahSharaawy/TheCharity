@@ -1,5 +1,8 @@
 ﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.CampaignDTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
+using TheCharityBLL.Extensions;
+using TheCharityBLL.DTOs.CampaignDTOs;
 using TheCharityBLL.Events.Abstraction;
 using TheCharityBLL.Events.CampaignEvents;
 using TheCharityBLL.Mapper;
@@ -184,23 +187,26 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Solo Campaign Operations =====
 
-        public async Task<ServiceResponse<IEnumerable<SoloCampaignResponseDto>>> GetAllSoloCampaignsAsync(bool includeDeleted = false)
+        public async Task<ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>> GetAllSoloCampaignsAsync(PaginationParametersDto parametersDto, bool includeDeleted = false)
         {
-            IEnumerable<SoloCampaign> campaigns;
+            (IEnumerable<SoloCampaign> Data, int TotalCount) campaigns;
 
             if (includeDeleted)
             {
-                var allCampaigns = await _campaignRepository.GetAllCampaignsAsync(true);
-                campaigns = allCampaigns.OfType<SoloCampaign>();
+                var allCampaigns = await _campaignRepository.GetAllCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, true);
+                campaigns.Data = allCampaigns.Data.OfType<SoloCampaign>();
+                campaigns.TotalCount = allCampaigns.TotalCount;
             }
             else
             {
-                campaigns = await _campaignRepository.GetAllSoloCampaignsAsync();
+                campaigns = await _campaignRepository.GetAllSoloCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize);
             }
 
-            var response = _mapper.MapToSoloResponseDtos(campaigns);
+            var campaignsDtos = _mapper.MapToSoloResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<SoloCampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -301,21 +307,23 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<SoloCampaignResponseDto>>> GetSoloCampaignsByOrganizationIdAsync(int organizationId)
+        public async Task<ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>> GetSoloCampaignsByOrganizationIdAsync(PaginationParametersDto parametersDto, int organizationId)
         {
             if (!await _organizationRepository.OrganizationExistsAsync(organizationId))
             {
-                return new ServiceResponse<IEnumerable<SoloCampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>
                 {
                     Success = false,
                     Message = $"Organization with ID {organizationId} not found."
                 };
             }
 
-            var campaigns = await _campaignRepository.GetSoloCampaignsByOrganizationIdAsync(organizationId);
-            var response = _mapper.MapToSoloResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetSoloCampaignsByOrganizationIdAsync(parametersDto.PageNumber, parametersDto.PageSize, organizationId);
+            var campaignsDto = _mapper.MapToSoloResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<SoloCampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDto, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -323,12 +331,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<SoloCampaignResponseDto>>> GetSoloCampaignsByStatusAsync(CampaignStatus status)
+        public async Task<ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>> GetSoloCampaignsByStatusAsync(PaginationParametersDto parametersDto, CampaignStatus status)
         {
-            var campaigns = await _campaignRepository.GetSoloCampaignsByStatusAsync(status);
-            var response = _mapper.MapToSoloResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetSoloCampaignsByStatusAsync(parametersDto.PageNumber, parametersDto.PageSize, status);
+            var campaignsDto = _mapper.MapToSoloResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<SoloCampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDto, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<SoloCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -338,23 +348,25 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Shared Campaign Operations =====
 
-        public async Task<ServiceResponse<IEnumerable<SharedCampaignResponseDto>>> GetAllSharedCampaignsAsync(bool includeDeleted = false)
+        public async Task<ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>> GetAllSharedCampaignsAsync(PaginationParametersDto parametersDto, bool includeDeleted = false)
         {
-            IEnumerable<SharedCampaign> campaigns;
+            (IEnumerable<SharedCampaign> Data, int TotalCount) campaigns;
 
             if (includeDeleted)
             {
-                var allCampaigns = await _campaignRepository.GetAllCampaignsAsync(true);
-                campaigns = allCampaigns.OfType<SharedCampaign>();
+                var allCampaigns = await _campaignRepository.GetAllCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, true);
+                campaigns.Data = allCampaigns.Data.OfType<SharedCampaign>();
+                campaigns.TotalCount = allCampaigns.TotalCount;
             }
             else
             {
-                campaigns = await _campaignRepository.GetAllSharedCampaignsAsync();
+                campaigns = await _campaignRepository.GetAllSharedCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize);
             }
 
-            var response = _mapper.MapToSharedResponseDtos(campaigns);
+            var campaignsDtos = _mapper.MapToSharedResponseDtos(campaigns.Data);
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
 
-            return new ServiceResponse<IEnumerable<SharedCampaignResponseDto>>
+            return new ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -452,21 +464,23 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<SharedCampaignResponseDto>>> GetSharedCampaignsByOrganizationIdAsync(int organizationId)
+        public async Task<ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>> GetSharedCampaignsByOrganizationIdAsync(PaginationParametersDto parametersDto, int organizationId)
         {
             if (!await _organizationRepository.OrganizationExistsAsync(organizationId))
             {
-                return new ServiceResponse<IEnumerable<SharedCampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>
                 {
                     Success = false,
                     Message = $"Organization with ID {organizationId} not found."
                 };
             }
 
-            var campaigns = await _campaignRepository.GetSharedCampaignsByOrganizationIdAsync(organizationId);
-            var response = _mapper.MapToSharedResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetSharedCampaignsByOrganizationIdAsync(parametersDto.PageNumber, parametersDto.PageSize, organizationId);
+            var campaignsDtos = _mapper.MapToSharedResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<SharedCampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -474,12 +488,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<SharedCampaignResponseDto>>> GetSharedCampaignsByStatusAsync(CampaignStatus status)
+        public async Task<ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>> GetSharedCampaignsByStatusAsync(PaginationParametersDto parametersDto, CampaignStatus status)
         {
-            var campaigns = await _campaignRepository.GetSharedCampaignsByStatusAsync(status);
-            var response = _mapper.MapToSharedResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetSharedCampaignsByStatusAsync(parametersDto.PageNumber, parametersDto.PageSize, status);
+            var campaignsDtos = _mapper.MapToSharedResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<SharedCampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<SharedCampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -638,7 +654,7 @@ namespace TheCharityBLL.Services.Repository
             {
                 await UpdateCampaignStatusAsync(campaignId, CampaignStatus.Completed);
             }
-   
+
             return new ServiceResponse<bool>
             {
                 Success = true,
@@ -679,12 +695,14 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Filtering & Querying =====
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetAllCampaignsAsync(bool includeDeleted = false)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetAllCampaignsAsync(PaginationParametersDto parametersDto, bool includeDeleted = false)
         {
-            var campaigns = await _campaignRepository.GetAllCampaignsAsync(includeDeleted);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetAllCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, includeDeleted);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -692,12 +710,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsByStatusAsync(CampaignStatus status)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsByStatusAsync(PaginationParametersDto parametersDto, CampaignStatus status)
         {
-            var campaigns = await _campaignRepository.GetCampaignsByStatusAsync(status);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetCampaignsByStatusAsync(parametersDto.PageNumber, parametersDto.PageSize, status);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -705,12 +725,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsByTypeAsync(CampaignType type)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsByTypeAsync(PaginationParametersDto parametersDto, CampaignType type)
         {
-            var campaigns = await _campaignRepository.GetCampaignsByTypeAsync(type);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetCampaignsByTypeAsync(parametersDto.PageNumber, parametersDto.PageSize, type);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -718,22 +740,24 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetActiveCampaignsAsync()
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetActiveCampaignsAsync(PaginationParametersDto parametersDto)
         {
-            return await GetCampaignsByStatusAsync(CampaignStatus.Active);
+            return await GetCampaignsByStatusAsync(parametersDto, CampaignStatus.Active);
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> SearchCampaignsAsync(string searchTerm)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> SearchCampaignsAsync(PaginationParametersDto parametersDto, string searchTerm)
         {
             if (string.IsNullOrWhiteSpace(searchTerm))
             {
-                return await GetAllCampaignsAsync();
+                return await GetAllCampaignsAsync(parametersDto);
             }
 
-            var campaigns = await _campaignRepository.SearchCampaignsAsync(searchTerm);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.SearchCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, searchTerm);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -741,12 +765,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetDeletedCampaignsAsync()
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetDeletedCampaignsAsync(PaginationParametersDto parametersDto)
         {
-            var campaigns = await _campaignRepository.GetDeletedCampaignsAsync();
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetDeletedCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -756,21 +782,23 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Advanced Filtering =====
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsByTargetRangeAsync(double minTarget, double maxTarget)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsByTargetRangeAsync(PaginationParametersDto parametersDto, double minTarget, double maxTarget)
         {
             if (minTarget < 0 || maxTarget < minTarget)
             {
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = false,
                     Message = "Invalid target range."
                 };
             }
 
-            var campaigns = await _campaignRepository.GetCampaignsByTargetRangeAsync(minTarget, maxTarget);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetCampaignsByTargetRangeAsync(parametersDto.PageNumber, parametersDto.PageSize, minTarget, maxTarget);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -778,21 +806,23 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsByAchievementPercentageAsync(double minPercentage)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsByAchievementPercentageAsync(PaginationParametersDto parametersDto, double minPercentage)
         {
             if (minPercentage < 0 || minPercentage > 100)
             {
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = false,
                     Message = "Percentage must be between 0 and 100."
                 };
             }
 
-            var campaigns = await _campaignRepository.GetCampaignsByAchievementPercentageAsync(minPercentage);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetCampaignsByAchievementPercentageAsync(parametersDto.PageNumber, parametersDto.PageSize, minPercentage);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -800,12 +830,14 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsEndingSoonAsync(double remainingValue = 1000)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsEndingSoonAsync(PaginationParametersDto parametersDto, double remainingValue = 1000)
         {
-            var campaigns = await _campaignRepository.GetCampaignsEndingSoonAsync(remainingValue);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetCampaignsEndingSoonAsync(parametersDto.PageNumber, parametersDto.PageSize, remainingValue);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -943,18 +975,52 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Featured & Trending =====
 
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetTopCampaignsByAchievementAsync(PaginationParametersDto parametersDto, int limit = 10)
+        {
+            if (limit <= 0) limit = 10;
+
+            var campaigns = await _campaignRepository.GetTopCampaignsByAchievementAsync(parametersDto.PageNumber, parametersDto.PageSize, limit);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
+
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
+            {
+                Success = true,
+                Data = response,
+                Message = $"Top {limit} campaigns by achievement retrieved successfully."
+            };
+        }
+
         public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetTopCampaignsByAchievementAsync(int limit = 10)
         {
             if (limit <= 0) limit = 10;
 
             var campaigns = await _campaignRepository.GetTopCampaignsByAchievementAsync(limit);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns);
 
             return new ServiceResponse<IEnumerable<CampaignResponseDto>>
             {
                 Success = true,
-                Data = response,
+                Data = campaignsDtos,
                 Message = $"Top {limit} campaigns by achievement retrieved successfully."
+            };
+        }
+
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetTopCampaignsByDonationsAsync(PaginationParametersDto parametersDto, int limit = 10)
+        {
+            if (limit <= 0) limit = 10;
+
+            var campaigns = await _campaignRepository.GetTopCampaignsByDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, limit);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
+
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
+            {
+                Success = true,
+                Data = response,
+                Message = $"Top {limit} campaigns by donations retrieved successfully."
             };
         }
 
@@ -963,24 +1029,28 @@ namespace TheCharityBLL.Services.Repository
             if (limit <= 0) limit = 10;
 
             var campaigns = await _campaignRepository.GetTopCampaignsByDonationsAsync(limit);
-            var response = _mapper.MapToResponseDtos(campaigns);
+
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns);
+
 
             return new ServiceResponse<IEnumerable<CampaignResponseDto>>
             {
                 Success = true,
-                Data = response,
+                Data = campaignsDtos,
                 Message = $"Top {limit} campaigns by donations retrieved successfully."
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetRecentCampaignsAsync(int days = 30)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetRecentCampaignsAsync(PaginationParametersDto parametersDto, int days = 30)
         {
             if (days <= 0) days = 30;
 
-            var campaigns = await _campaignRepository.GetRecentCampaignsAsync(days);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetRecentCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, days);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -988,21 +1058,23 @@ namespace TheCharityBLL.Services.Repository
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetUrgentCampaignsAsync(double minPercentage = 75)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetUrgentCampaignsAsync(PaginationParametersDto parametersDto, double minPercentage = 75)
         {
             if (minPercentage < 0 || minPercentage > 100)
             {
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = false,
                     Message = "Percentage must be between 0 and 100."
                 };
             }
 
-            var campaigns = await _campaignRepository.GetUrgentCampaignsAsync(minPercentage);
-            var response = _mapper.MapToResponseDtos(campaigns);
+            var campaigns = await _campaignRepository.GetUrgentCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, minPercentage);
+            var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-            return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+            var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
             {
                 Success = true,
                 Data = response,
@@ -1012,23 +1084,25 @@ namespace TheCharityBLL.Services.Repository
 
         // ===== Deadline Operations =====
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetCampaignsByDeadlineAsync(DateTime deadlineDate, bool includeDeleted = false)
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsByDeadlineAsync(PaginationParametersDto parametersDto, DateTime deadlineDate, bool includeDeleted = false)
         {
             try
             {
-                var campaigns = await _campaignRepository.GetCampaignsByDeadlineAsync(deadlineDate, includeDeleted);
-                var responseDtos = _mapper.MapToResponseDtos(campaigns);
+                var campaigns = await _campaignRepository.GetCampaignsByDeadlineAsync(parametersDto.PageNumber, parametersDto.PageSize, deadlineDate, includeDeleted);
+                var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = true,
                     Message = $"Campaigns with deadline <= {deadlineDate:yyyy-MM-dd} retrieved successfully.",
-                    Data = responseDtos
+                    Data = response
                 };
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = false,
                     Message = $"Failed to retrieve campaigns: {ex.Message}"
@@ -1036,26 +1110,62 @@ namespace TheCharityBLL.Services.Repository
             }
         }
 
-        public async Task<ServiceResponse<IEnumerable<CampaignResponseDto>>> GetExpiredCampaignsAsync()
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetExpiredCampaignsAsync(PaginationParametersDto parametersDto)
         {
             try
             {
-                var campaigns = await _campaignRepository.GetExpiredCampaignsAsync();
-                var responseDtos = _mapper.MapToResponseDtos(campaigns);
+                var campaigns = await _campaignRepository.GetExpiredCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize);
+                var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
 
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = true,
                     Message = "Expired campaigns retrieved successfully.",
-                    Data = responseDtos
+                    Data = response
                 };
             }
             catch (Exception ex)
             {
-                return new ServiceResponse<IEnumerable<CampaignResponseDto>>
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
                 {
                     Success = false,
                     Message = $"Failed to retrieve expired campaigns: {ex.Message}"
+                };
+            }
+        }
+
+        public async Task<ServiceResponse<PagedResultDto<CampaignResponseDto>>> GetCampaignsExpiringSoonAsync(PaginationParametersDto parametersDto, int daysThreshold = 7)
+        {
+            try
+            {
+                if (daysThreshold <= 0) daysThreshold = 7;
+
+                var campaigns = await _campaignRepository.GetCampaignsExpiringSoonAsync(parametersDto.PageNumber, parametersDto.PageSize, daysThreshold);
+                var campaignsDtos = _mapper.MapToResponseDtos(campaigns.Data);
+
+                var response = campaigns.ToPagedResult(campaignsDtos, parametersDto);
+
+                // Calculate days remaining for each campaign
+                foreach (var dto in campaignsDtos)
+                {
+                    // You might want to add a DaysRemaining property to CampaignResponseDto
+                }
+
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
+                {
+                    Success = true,
+                    Message = $"Campaigns expiring within {daysThreshold} days retrieved successfully.",
+                    Data = response
+                };
+            }
+            catch (Exception ex)
+            {
+                return new ServiceResponse<PagedResultDto<CampaignResponseDto>>
+                {
+                    Success = false,
+                    Message = $"Failed to retrieve expiring campaigns: {ex.Message}"
                 };
             }
         }
@@ -1067,10 +1177,10 @@ namespace TheCharityBLL.Services.Repository
                 if (daysThreshold <= 0) daysThreshold = 7;
 
                 var campaigns = await _campaignRepository.GetCampaignsExpiringSoonAsync(daysThreshold);
-                var responseDtos = _mapper.MapToResponseDtos(campaigns);
+                var campaignsDtos = _mapper.MapToResponseDtos(campaigns);
 
                 // Calculate days remaining for each campaign
-                foreach (var dto in responseDtos)
+                foreach (var dto in campaignsDtos)
                 {
                     // You might want to add a DaysRemaining property to CampaignResponseDto
                 }
@@ -1079,7 +1189,7 @@ namespace TheCharityBLL.Services.Repository
                 {
                     Success = true,
                     Message = $"Campaigns expiring within {daysThreshold} days retrieved successfully.",
-                    Data = responseDtos
+                    Data = campaignsDtos
                 };
             }
             catch (Exception ex)
