@@ -1,69 +1,67 @@
-﻿
-using TheCharityBLL.DTOs;
+﻿using TheCharityBLL.DTOs;
 using TheCharityBLL.DTOs.OrganizationContactMethodDTOs;
 using TheCharityBLL.DTOs.OrganizationDTOs;
-using TheCharityBLL.DTOs.PaymentInfoDTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
 using TheCharityBLL.DTOs.UserDTOs;
-using TheCharityDAL.Entities;
 using TheCharityDAL.Enums;
 
 namespace TheCharityBLL.Services.Abstraction
 {
     public interface IOrganizationService
     {
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetAllOrganizations(bool includeDeleted = false);
-        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationById(int id);
-        Task<ServiceResponse<OrganizationResponseDto>> CreateOrganization(CreateOrganizationDto organization);
-        Task<ServiceResponse<OrganizationResponseDto>> UpdateOrganization(int id,UpdateOrganizationDto organization);
-        Task<ServiceResponse<bool>> DeleteOrganization(int id);
-        Task<ServiceResponse<bool>> RestoreOrganization(int id);
+        // ===== Organization CRUD Operations =====
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetAllOrganizationsAsync(PaginationParametersDto filterDto, bool includeDeleted = false);
+        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByIdAsync(int id);
+        Task<ServiceResponse<OrganizationResponseDto>> CreateOrganizationAsync(CreateOrganizationDto organization);
+        Task<ServiceResponse<OrganizationResponseDto>> UpdateOrganizationAsync(int id, UpdateOrganizationDto organization);
+        Task<ServiceResponse<bool>> DeleteOrganizationAsync(int id);
+        Task<ServiceResponse<bool>> RestoreOrganizationAsync(int id);
 
-        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByName(string name);
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> SearchOrganizations(string searchTerm);
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetDeletedOrganizations();
-        Task<ServiceResponse<IEnumerable<OrganizationDropDownListDto>>> GetOrganizationsDropDown();
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsByAddress(string address);
+        // ===== Organization Filtering & Search =====
+        Task<ServiceResponse<OrganizationResponseDto>> GetOrganizationByNameAsync(string name);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> SearchOrganizationsAsync(PaginationParametersDto filterDto, string searchTerm);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetDeletedOrganizationsAsync(PaginationParametersDto filterDto);
+        Task<ServiceResponse<IEnumerable<OrganizationDropDownListDto>>> GetOrganizationsDropDownAsync();
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsByAddressAsync(PaginationParametersDto filterDto, string address);
 
-        Task<ServiceResponse<int>> GetTotalOrganizationsCount();
-        Task<ServiceResponse<int>> GetActiveOrganizationsCount();
+        // ===== Organization Statistics =====
+        Task<ServiceResponse<int>> GetTotalOrganizationsCountAsync();
+        Task<ServiceResponse<int>> GetActiveOrganizationsCountAsync();
 
-        Task<ServiceResponse<IEnumerable<OrgContactMethodResponseDto>>> GetOrganizationContactMethods(int organizationId);
-        Task<ServiceResponse<OrgContactMethodResponseDto>> GetContactMethodById(int contactMethodId);
-        Task<ServiceResponse<OrgContactMethodResponseDto>> CreateContactMethod(CreateOrgContactMethodDto contactMethod);
-        Task<ServiceResponse<OrgContactMethodResponseDto>> UpdateContactMethod(int id,UpdateOrgContactMethodDto contactMethod);
-        Task<ServiceResponse<bool>> DeleteContactMethod(int contactMethodId);
-        Task<ServiceResponse<bool>> RestoreContactMethod(int contactMethodId);
-        Task<ServiceResponse<IEnumerable<OrgContactMethodResponseDto>>> GetContactMethodsByType(int organizationId, ContactType type);
+        // ===== Organization Contact Methods =====
+        Task<ServiceResponse<PagedResultDto<OrgContactMethodResponseDto>>> GetOrganizationContactMethodsAsync(PaginationParametersDto filterDto, int organizationId);
+        Task<ServiceResponse<OrgContactMethodResponseDto>> GetContactMethodByIdAsync(int contactMethodId);
+        Task<ServiceResponse<OrgContactMethodResponseDto>> CreateContactMethodAsync(CreateOrgContactMethodDto contactMethod);
+        Task<ServiceResponse<OrgContactMethodResponseDto>> UpdateContactMethodAsync(int id, UpdateOrgContactMethodDto contactMethod);
+        Task<ServiceResponse<bool>> DeleteContactMethodAsync(int contactMethodId);
+        Task<ServiceResponse<bool>> RestoreContactMethodAsync(int contactMethodId);
+        Task<ServiceResponse<PagedResultDto<OrgContactMethodResponseDto>>> GetContactMethodsByTypeAsync(PaginationParametersDto filterDto, int organizationId, ContactType type);
 
-        //Task<ServiceResponse<PaymentInfoResponseDto>> GetPaymentInfoByOrganizationId(int organizationId);
-        //Task<ServiceResponse<PaymentInfoResponseDto>> GetPaymentInfoById(int paymentInfoId);
-        //Task<ServiceResponse<PaymentInfoResponseDto>> CreatePaymentInfo(CreatePaymentInfoDto paymentInfo);
-        //Task<ServiceResponse<PaymentInfoResponseDto>> UpdatePaymentInfo(int id,UpdatePaymentInfoDto paymentInfo);
-        //Task<ServiceResponse<bool>> DeletePaymentInfo(int paymentInfoId);
-        //Task<ServiceResponse<bool>> RestorePaymentInfo(int paymentInfoId);
-        //Task<ServiceResponse<bool>> HasPaymentInfo(int organizationId);
+        // ===== Organization Performance =====
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsByCampaignCountAsync(PaginationParametersDto filterDto, int minCampaigns = 1);
 
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsByCampaignCount(int minCampaigns = 1);
+        // ===== Validation & Checks =====
+        Task<ServiceResponse<bool>> OrganizationNameExistsAsync(string name);
 
-        //Task<ServiceResponse<bool> OrganizationExists(int id);
-        //Task<ServiceResponse<bool> OrganizationNameExists(string name);
+        // ===== Eager Loading =====
+        Task<ServiceResponse<OrganizationDetailsDto>> GetOrganizationDetailsAsync(int id);
 
-        Task<ServiceResponse<OrganizationDetailsDto>> GetOrganizationDetails(int id);
+        // ===== Dashboard & Reporting =====
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetRecentlyRegisteredOrganizationsAsync(PaginationParametersDto filterDto, int days = 7);
 
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetRecentlyRegisteredOrganizations(int days = 7);
+        // ===== Advanced Queries =====
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsWithoutCampaignsAsync(PaginationParametersDto filterDto);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsWithoutPaymentInfoAsync(PaginationParametersDto filterDto);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsWithActiveCampaignsAsync(PaginationParametersDto filterDto);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsWithCompletedCampaignsAsync(PaginationParametersDto filterDto);
 
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsWithoutCampaigns();
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsWithoutPaymentInfo();
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsWithActiveCampaigns();
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsWithCompletedCampaigns();
+        // ===== Contact Method Utilities =====
+        Task<ServiceResponse<int>> GetContactMethodCountByTypeAsync(int organizationId, ContactType type);
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsByContactTypeAsync(PaginationParametersDto filterDto, ContactType type);
 
-        //Task<ServiceResponse<bool> ContactMethodExists(int organizationId, ContactType type, string value);
-        Task<ServiceResponse<int>> GetContactMethodCountByType(int organizationId, ContactType type);
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsByContactType(ContactType type);
-
-        //Task<ServiceResponse<bool> ValidatePaymentInfo(int organizationId);
-        Task<ServiceResponse<IEnumerable<OrganizationResponseDto>>> GetOrganizationsWithValidPaymentInfo();
-        Task<ServiceResponse<Dictionary<int, DateTime>>> GetOrganizationLastPaymentUpdate();
+        // ===== Payment Info Utilities =====
+        Task<ServiceResponse<PagedResultDto<OrganizationResponseDto>>> GetOrganizationsWithValidPaymentInfoAsync(PaginationParametersDto filterDto);
+        Task<ServiceResponse<Dictionary<int, DateTime>>> GetOrganizationLastPaymentUpdateAsync();
 
         // ===== Sub-Admin Management =====
         Task<ServiceResponse<OrganizationRoleResponseDto>> AddSubAdminAsync(int organizationId, string userId);
@@ -76,5 +74,6 @@ namespace TheCharityBLL.Services.Abstraction
         Task<ServiceResponse<OrganizationResponseDto>> RemoveOrganizationAdminAsync(int organizationId);
         Task<ServiceResponse<OrganizationResponseDto>> TransferOrganizationAdminAsync(int organizationId, string newAdminUserId);
         Task<ServiceResponse<UserResponseDTO?>> GetOrganizationAdminAsync(int organizationId);
+
     }
 }
