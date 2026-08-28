@@ -4,9 +4,11 @@ using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Security.Claims;
 using TheCharityBLL.Authorization.Attributes;
 using TheCharityBLL.DTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
 using TheCharityBLL.DTOs.UserDTOs;
 using TheCharityBLL.DTOs.UserResponseDTOs;
 using TheCharityBLL.Services.Abstraction;
+using TheCharityBLL.ViewModels.User;
 
 
 namespace TheCharityPL.Controllers
@@ -48,47 +50,51 @@ namespace TheCharityPL.Controllers
 
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetAll([FromQuery] bool showDeleted = false)
+        public async Task<IActionResult> GetAll([FromQuery] PaginationParametersDto paginationDto, [FromQuery] bool showDeleted = false)
         {
             try
             {
                 _logger.LogInformation("Loading all users");
 
-                var users = await _userService.GetAllUsersAsync();
+                var users = await _userService.GetAllUsersAsync(paginationDto);
 
                 if (!showDeleted)
-                    users = users.Where(u => !u.IsDeleted);
+                    users.Items = users.Items.Where(u => !u.IsDeleted);
 
-                var result = users.Select(u => new UserListResponseDto
+                var result = new PagedResultDto<UserListViewModel>
                 {
-                    Id = u.Id,
-                    UserName = u.UserName,
-                    Email = u.Email,
-                    FullName = u.FullName,
-                    PhoneNumber = u.PhoneNumber,
-                    IsDeleted = u.IsDeleted,
-                    RegistrationDate = u.RegistrationDate,
-                    EmailConfirmed = u.EmailConfirmed
-                }).OrderByDescending(u => u.RegistrationDate).ToList();
+                    Items = users.Items
+             .Select(u => new UserListViewModel
+             {
+                 Id = u.Id,
+                 UserName = u.UserName,
+                 Email = u.Email,
+                 FullName = u.FullName,
+                 PhoneNumber = u.PhoneNumber,
+                 IsDeleted = u.IsDeleted,
+                 RegistrationDate = u.RegistrationDate,
+                 EmailConfirmed = u.EmailConfirmed
+             })
+             .OrderByDescending(u => u.RegistrationDate)
+             .ToList(),
 
-                var api_response=new ServiceResponse<List<UserListResponseDto>> 
-                {
-                    Data = result,
-                    Success = true,
-                    Message = "Users loaded successfully."
+                    TotalCount = users.TotalCount,
+                    PageNumber = users.PageNumber,
+                    PageSize = users.PageSize
                 };
-                return Ok(api_response);
+
+                return Ok(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error loading users");
-                return StatusCode(500, new ServiceResponse{Success = false, Message = "An error occurred while loading users." });
+                return StatusCode(500, new { message = "An error occurred while loading users." });
             }
         }
         /// <summary>
         /// get user information by user id 
         /// </summary>
-        
+
         // ─── GET api/user/{id} ───────────────────────────────────────────────────────
 
         [HttpGet("{id}")]

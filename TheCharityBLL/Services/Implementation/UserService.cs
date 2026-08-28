@@ -8,7 +8,9 @@ using System.Security.Claims;
 using System.Text;
 
 using TheCharityBLL.DTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
 using TheCharityBLL.DTOs.UserDTOs;
+using TheCharityBLL.Extensions;
 using TheCharityBLL.Services.Abstraction;
 using TheCharityDAL.Entities;
 
@@ -99,6 +101,23 @@ namespace TheCharityBLL.Services.Repository
                 _logger.LogInformation("Getting all users");
                 var users = await _userRepository.GetAllUsersAsync();
                 return _mapper.Map<IEnumerable<UserResponseDTO>>(users);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting all users");
+                throw;
+            }
+        }
+
+        //pagination
+        public async Task<PagedResultDto<UserResponseDTO>> GetAllUsersAsync(PaginationParametersDto paginationDto)
+        {
+            try
+            {
+                _logger.LogInformation("Getting all users");
+                var users = await _userRepository.GetAllUsersAsync(paginationDto.PageNumber, paginationDto.PageSize);
+                var usersDto = _mapper.Map<IEnumerable<UserResponseDTO>>(users.Data);
+                return users.ToPagedResult(usersDto, paginationDto);
             }
             catch (Exception ex)
             {
