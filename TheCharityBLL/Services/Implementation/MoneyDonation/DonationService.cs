@@ -2,8 +2,10 @@
 using TheCharityBLL.DTOs;
 
 using TheCharityBLL.DTOs.DonationDTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
 using TheCharityBLL.Events.Abstraction;
 using TheCharityBLL.Events.DonationEvents;
+using TheCharityBLL.Extensions;
 using TheCharityBLL.Mapper;
 using TheCharityBLL.Services.Abstraction.MoneyDonation;
 
@@ -26,16 +28,18 @@ namespace TheCharityBLL.Services.Implementation.MoneyDonation
 
         // ===== CRUD =====
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetAllDonationsAsync(bool includeDeleted = false)
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetAllDonationsAsync(PaginationParametersDto parametersDto, bool includeDeleted = false)
         {
-            var donations = await _repo.GetAllDonationsAsync(includeDeleted);
-            var DonationsDto = _mapper.MapToDonationResponseDtos(donations);
-            return new ServiceResponse<IEnumerable<DonationResponseDto>>
+            var donations = await _repo.GetAllDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, includeDeleted);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
             {
                 Success = true
                 ,
                 Message = "",
-                Data = DonationsDto
+                Data = result
             };
         }
 
@@ -101,24 +105,84 @@ namespace TheCharityBLL.Services.Implementation.MoneyDonation
         }
 
         // ===== Filtering & Search =====
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByUserAsync(PaginationParametersDto parametersDto, string userId)
+        {
+            var donations = await _repo.GetDonationsByUserAsync(parametersDto.PageNumber, parametersDto.PageSize, userId);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = $"retrieved donations by id:{userId} successfully"
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByUserAsync(string userId)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByUserAsync(userId)), Success = true, Message = $"retrieved donations by id:{userId} successfully" };
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByCampaignAsync(int campaignId)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByCampaignAsync(campaignId)), Success = true, Message = $"retrieved donations by id:{campaignId} successfully" };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByCampaignAsync(PaginationParametersDto parametersDto, int campaignId)
+        {
+            var donations = await _repo.GetDonationsByCampaignAsync(parametersDto.PageNumber, parametersDto.PageSize, campaignId);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = $"retrieved donations by id:{campaignId} successfully"
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByAmountRangeAsync(double minAmount, double maxAmount)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByAmountRangeAsync(minAmount, maxAmount)), Success = true, Message = "retrieved donations by amount range successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByAmountRangeAsync(PaginationParametersDto parametersDto, double minAmount, double maxAmount)
+        {
+            var donations = await _repo.GetDonationsByAmountRangeAsync(parametersDto.PageNumber, parametersDto.PageSize, minAmount, maxAmount);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved donations by amount range successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByDateRangeAsync(DateTime startDate, DateTime endDate)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByDateRangeAsync(startDate, endDate)), Success = true, Message = "retrieved donations by date range successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByDateRangeAsync(PaginationParametersDto parametersDto, DateTime startDate, DateTime endDate)
+        {
+            var donations = await _repo.GetDonationsByDateRangeAsync(parametersDto.PageNumber, parametersDto.PageSize, startDate, endDate);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved donations by date range successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetRecentDonationsAsync(int days = 30)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetRecentDonationsAsync(days)), Success = true, Message = "retrieved recent donations successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetRecentDonationsAsync(PaginationParametersDto parametersDto, int days = 30)
+        {
+            var donations = await _repo.GetRecentDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, days);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved recent donations successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDeletedDonationsAsync()
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDeletedDonationsAsync()), Success = true, Message = "retrieved deleted donations successfully" };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDeletedDonationsAsync(PaginationParametersDto parametersDto)
+        {
+            var donations = await _repo.GetDeletedDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved deleted donations successfully"
+            };
+        }
 
         // ===== Statistics =====
 
@@ -171,13 +235,35 @@ namespace TheCharityBLL.Services.Implementation.MoneyDonation
         public async Task<ServiceResponse<double>> GetCampaignProgressPercentageAsync(int campaignId)
             => new ServiceResponse<double> { Data = await _repo.GetCampaignProgressPercentageAsync(campaignId), Success = true, Message = "retrieved progress percentage for specific campaign successfully." };
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetUsersDonationsOfACampaignAsync(int campaignId)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetUsersDonationsOfACampaignAsync(campaignId)), Success = true, Message = "retrieved users , where they donated for specific campaign successfully" };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetUsersDonationsOfACampaignAsync(PaginationParametersDto parametersDto, int campaignId)
+        {
+            var donations = await _repo.GetUsersDonationsOfACampaignAsync(parametersDto.PageNumber, parametersDto.PageSize, campaignId);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved users , where they donated for specific campaign successfully"
+            };
+        }
 
         // ===== User-Specific =====
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetUserDonationHistoryAsync(string userId)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetUserDonationHistoryAsync(userId)), Success = true, Message = "retrieved donation history for specific user successfully" };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetUserDonationHistoryAsync(PaginationParametersDto parametersDto, string userId)
+        {
+            var donations = await _repo.GetUserDonationHistoryAsync(parametersDto.PageNumber, parametersDto.PageSize, userId);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved donation history for specific user successfully"
+            };
+        }
+
 
         public async Task<ServiceResponse<DateTime?>> GetUserLastDonationDateAsync(string userId)
             => new ServiceResponse<DateTime?> { Data = await _repo.GetUserLastDonationDateAsync(userId), Success = true, Message = "retrieved last donation for specific user successfully." };
@@ -212,81 +298,172 @@ namespace TheCharityBLL.Services.Implementation.MoneyDonation
 
         // ===== Dashboard & Reporting =====
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetLatestDonationsAsync(int limit = 10)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetLatestDonationsAsync(limit)), Success = true, Message = "retrieved latest donations successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetLatestDonationsAsync(PaginationParametersDto parametersDto, int limit = 10)
+        {
+            var donations = await _repo.GetLatestDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, limit);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved latest donations successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetLargestDonationsAsync(int limit = 10)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetLargestDonationsAsync(limit)), Success = true, Message = "retrieved largest donations successfully" };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetLargestDonationsAsync(PaginationParametersDto parametersDto, int limit = 10)
+        {
+            var donations = await _repo.GetLargestDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, limit);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved largest donations successfully."
+            };
+
+        }
 
         public async Task<ServiceResponse<Dictionary<int, int>>> GetDonationsPerCampaignCountAsync()
-            =>new ServiceResponse<Dictionary<int, int>> { Data = await _repo.GetDonationsPerCampaignCountAsync(), Success = true, Message = "retrieved count of the donations per campaign successfully." };
+            => new ServiceResponse<Dictionary<int, int>> { Data = await _repo.GetDonationsPerCampaignCountAsync(), Success = true, Message = "retrieved count of the donations per campaign successfully." };
 
         public async Task<ServiceResponse<Dictionary<string, int>>> GetDonationsPerUserCountAsync()
-            =>new ServiceResponse<Dictionary<string, int>> { Data = await _repo.GetDonationsPerUserCountAsync(), Success = true, Message = "retrieved count of the donations per user successfully." };
+            => new ServiceResponse<Dictionary<string, int>> { Data = await _repo.GetDonationsPerUserCountAsync(), Success = true, Message = "retrieved count of the donations per user successfully." };
 
         public async Task<ServiceResponse<double>> GetTodayDonationsTotalAsync()
             => new ServiceResponse<double> { Data = await _repo.GetTodayDonationsTotalAsync(), Success = true, Message = "retrieved count for this day donations successfully." };
 
         public async Task<ServiceResponse<double>> GetThisWeekDonationsTotalAsync()
-            =>new ServiceResponse<double> { Data = await _repo.GetThisWeekDonationsTotalAsync(), Success = true, Message = "retrieved count for this week donations successfully." };
+            => new ServiceResponse<double> { Data = await _repo.GetThisWeekDonationsTotalAsync(), Success = true, Message = "retrieved count for this week donations successfully." };
 
         public async Task<ServiceResponse<double>> GetThisMonthDonationsTotalAsync()
-            =>new ServiceResponse<double> { Data = await _repo.GetThisMonthDonationsTotalAsync(), Success = true, Message = "retrieved count for this month donations successfully." };
+            => new ServiceResponse<double> { Data = await _repo.GetThisMonthDonationsTotalAsync(), Success = true, Message = "retrieved count for this month donations successfully." };
 
         // ===== Financial Reporting =====
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetMonthlyDonationsReportAsync(int year)
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetMonthlyDonationsReportAsync(year), Success = true, Message = "retrieved Monthly Donations Report successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetMonthlyDonationsReportAsync(year), Success = true, Message = "retrieved Monthly Donations Report successfully." };
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetQuarterlyDonationsReportAsync(int year)
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetQuarterlyDonationsReportAsync(year), Success = true, Message = "retrieved Quarterly Donations Report successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetQuarterlyDonationsReportAsync(year), Success = true, Message = "retrieved Quarterly Donations Report successfully." };
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetYearlyDonationsReportAsync(int yearsBack = 5)
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetYearlyDonationsReportAsync(yearsBack), Success = true, Message = "retrieved yearly donations report successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetYearlyDonationsReportAsync(yearsBack), Success = true, Message = "retrieved yearly donations report successfully." };
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetDonationsByTimeOfDayAsync()
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetDonationsByTimeOfDayAsync(), Success = true, Message = "retrieved the donations by time of a day successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetDonationsByTimeOfDayAsync(), Success = true, Message = "retrieved the donations by time of a day successfully." };
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetDonationsByDayOfWeekAsync()
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetDonationsByDayOfWeekAsync(), Success = true, Message = "retrieved the donations by day of a week successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetDonationsByDayOfWeekAsync(), Success = true, Message = "retrieved the donations by day of a week successfully." };
 
         // ===== Campaign Performance =====
 
         public async Task<ServiceResponse<Dictionary<DateTime, double>>> GetCampaignDonationTimelineAsync(int campaignId)
-            =>new ServiceResponse<Dictionary<DateTime, double>> { Data = await _repo.GetCampaignDonationTimelineAsync(campaignId), Success = true, Message = "retrieved the donation time line for specific campaign successfully." };
+            => new ServiceResponse<Dictionary<DateTime, double>> { Data = await _repo.GetCampaignDonationTimelineAsync(campaignId), Success = true, Message = "retrieved the donation time line for specific campaign successfully." };
 
         // ===== User Engagement =====
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetRecurringDonorsAsync(PaginationParametersDto parametersDto, int minDonations = 3)
+        {
+            var donors = await _repo.GetRecurringDonorsAsync(parametersDto.PageNumber, parametersDto.PageSize, minDonations);
+            var donorsDtos = _mapper.MapToDonationResponseDtos(donors.Data);
+            var result = donors.ToPagedResult(donorsDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved Recurring Donors successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetRecurringDonorsAsync(int minDonations = 3)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetRecurringDonorsAsync(minDonations)), Success = true, Message = "retrieved Recurring Donors successfully." };
-
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetFirstTimeDonorsAsync(DateTime startDate, DateTime endDate)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetFirstTimeDonorsAsync(startDate, endDate)), Success = true, Message = "retrieved first time donors successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetFirstTimeDonorsAsync(PaginationParametersDto parametersDto, DateTime startDate, DateTime endDate)
+        {
+            var donors = await _repo.GetFirstTimeDonorsAsync(parametersDto.PageNumber, parametersDto.PageSize, startDate, endDate);
+            var donorsDtos = _mapper.MapToDonationResponseDtos(donors.Data);
+            var result = donors.ToPagedResult(donorsDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved first time donors successfully."
+            };
+        }
 
         public async Task<ServiceResponse<Dictionary<string, double>>> GetUserLifetimeValueAsync()
-            =>new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetUserLifetimeValueAsync(), Success = true, Message = "retrieved list of users assigned with life time value successfully." };
+            => new ServiceResponse<Dictionary<string, double>> { Data = await _repo.GetUserLifetimeValueAsync(), Success = true, Message = "retrieved list of users assigned with life time value successfully." };
 
         public async Task<ServiceResponse<IEnumerable<string>>> GetLoyalDonorsAsync(double minTotalAmount = 1000, int minDonations = 5)
-            =>new ServiceResponse<IEnumerable<string>> { Data = await _repo.GetLoyalDonorsAsync(minTotalAmount, minDonations), Success = true, Message = "retrieved the loyal donors successfully." };
+            => new ServiceResponse<IEnumerable<string>> { Data = await _repo.GetLoyalDonorsAsync(minTotalAmount, minDonations), Success = true, Message = "retrieved the loyal donors successfully." };
 
         // ===== Search & Filter Combinations =====
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> SearchDonationsByUserAndCampaignAsync(PaginationParametersDto parametersDto, string userId, int campaignId)
+        {
+            var donations = await _repo.SearchDonationsByUserAndCampaignAsync(parametersDto.PageNumber, parametersDto.PageSize, userId, campaignId);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved the donations for specific user and campaign successfuly."
+            };
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> SearchDonationsByUserAndCampaignAsync(string userId, int campaignId)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.SearchDonationsByUserAndCampaignAsync(userId, campaignId)), Success = true, Message = "retrieved the donations for specific user and campaign successfuly." };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByMultipleUsersAsync(IEnumerable<string> userIds)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByMultipleUsersAsync(userIds)), Success = true, Message = "retrieved the Donations by multiple users successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByMultipleUsersAsync(PaginationParametersDto parametersDto, IEnumerable<string> userIds)
+        {
+            var donations = await _repo.GetDonationsByMultipleUsersAsync(parametersDto.PageNumber, parametersDto.PageSize, userIds);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved the Donations by multiple users successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByMultipleCampaignsAsync(IEnumerable<int> campaignIds)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByMultipleCampaignsAsync(campaignIds)), Success = true, Message = "retrieved the Donations by multiple campaigns successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByMultipleCampaignsAsync(PaginationParametersDto parametersDto, IEnumerable<int> campaignIds)
+        {
+            var donations = await _repo.GetDonationsByMultipleCampaignsAsync(parametersDto.PageNumber, parametersDto.PageSize, campaignIds);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved the Donations by multiple campaigns successfully."
+            };
+        }
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetDonationsByAmountAndDateAsync(double minAmount, DateTime startDate)
-            => new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetDonationsByAmountAndDateAsync(minAmount, startDate)), Success = true, Message = "retrieved the donations in specific period limited by specific balance successfully." };
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetDonationsByAmountAndDateAsync(PaginationParametersDto parametersDto, double minAmount, DateTime startDate)
+        {
+            var donations = await _repo.GetDonationsByAmountAndDateAsync(parametersDto.PageNumber, parametersDto.PageSize, minAmount, startDate);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved the donations in specific period limited by specific balance successfully."
+            };
+        }
 
         // ===== Audit =====
+        public async Task<ServiceResponse<PagedResultDto<DonationResponseDto>>> GetSuspiciousDonationsAsync(PaginationParametersDto parametersDto, double amountThreshold = 10000)
+        {
+            var donations = await _repo.GetSuspiciousDonationsAsync(parametersDto.PageNumber, parametersDto.PageSize, amountThreshold);
+            var donationDtos = _mapper.MapToDonationResponseDtos(donations.Data);
+            var result = donations.ToPagedResult(donationDtos, parametersDto);
+            return new ServiceResponse<PagedResultDto<DonationResponseDto>>
+            {
+                Data = result,
+                Success = true,
+                Message = "retrieved Suspicious Donations successfully."
+            };
 
-        public async Task<ServiceResponse<IEnumerable<DonationResponseDto>>> GetSuspiciousDonationsAsync(double amountThreshold = 10000)
-            =>new ServiceResponse<IEnumerable<DonationResponseDto>> { Data = _mapper.MapToDonationResponseDtos(await _repo.GetSuspiciousDonationsAsync(amountThreshold)), Success = true, Message = "retrieved Suspicious Donations successfully." };
+        }
 
         // ===== Export =====
 
@@ -298,7 +475,7 @@ namespace TheCharityBLL.Services.Implementation.MoneyDonation
     }
 }
 
- 
-      
 
-    
+
+
+

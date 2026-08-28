@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity;
 
 using TheCharityBLL.DTOs;
+using TheCharityBLL.DTOs.PaginationDTOs;
 using TheCharityBLL.DTOs.UserDTOs;
 
 
@@ -10,6 +11,7 @@ namespace TheCharityBLL.Services.Abstraction
     {
         // Queries
         Task<IEnumerable<UserResponseDTO>> GetAllUsersAsync();
+        Task<PagedResultDto<UserResponseDTO>> GetAllUsersAsync(PaginationParametersDto paginationDto);
         Task<UserResponseDTO?> GetUserByIdAsync(string userId);
         Task<UserResponseDTO?> GetUserByEmailAsync(string email);
         Task<ServiceResponse<bool>> UserExistsAsync(string userId);
